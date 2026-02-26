@@ -7,7 +7,7 @@ import Childfour from "@/assets/images/childfour.jpeg";
 import Childfive from "@/assets/images/childfive.jpeg";
 import Childsix from "@/assets/images/childsix.jpeg";
 import Childseven from "@/assets/images/childseven.jpeg";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -20,10 +20,46 @@ const stats = [
 ];
 
 const Hero = () => {
-
-  // animation left content
   const leftContent = useRef(null);
 
+  // =============================
+  // Typing Loop Logic for "Building a"
+  // =============================
+  const fullText = "Building a";
+  const [displayText, setDisplayText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [showCompleteChild, setShowCompleteChild] = useState(false);
+
+  useEffect(() => {
+    const typingSpeed = isDeleting ? 50 : 100;
+
+    const timeout = setTimeout(() => {
+      if (!isDeleting) {
+        setDisplayText(fullText.slice(0, index + 1));
+        setIndex(index + 1);
+
+        if (index + 1 === fullText.length) {
+          setTimeout(() => setIsDeleting(true), 1000);
+          setShowCompleteChild(true);
+        }
+      } else {
+        setDisplayText(fullText.slice(0, index - 1));
+        setIndex(index - 1);
+
+        if (index - 1 === 0) {
+          setIsDeleting(false);
+          setShowCompleteChild(false);
+        }
+      }
+    }, typingSpeed);
+
+    return () => clearTimeout(timeout);
+  }, [index, isDeleting]);
+
+  // =============================
+  // Left content animation
+  // =============================
   useEffect(() => {
     gsap.from(leftContent.current, {
       y: 50,
@@ -32,12 +68,13 @@ const Hero = () => {
     });
   }, []);
 
-  // animation right content (continuous slider)
+  // =============================
+  // Right content (image slider)
+  // =============================
   const rightContentRef = useRef([]);
   const rightContainerRef = useRef(null);
 
   useEffect(() => {
-
     const images = rightContentRef.current;
 
     gsap.set(images, {
@@ -82,7 +119,22 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-green-light pt-24 pb-16">
-      {/* Subtle pattern overlay */}
+      {/* Blinking Cursor Style */}
+      <style>
+        {`
+          @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0; }
+          }
+          .cursor {
+            display: inline-block;
+            margin-left: 4px;
+            animation: blink 1s infinite;
+          }
+        `}
+      </style>
+
+      {/* Background pattern */}
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
@@ -93,7 +145,7 @@ const Hero = () => {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          
+
           {/* Left content */}
           <div
             className="max-w-xl translate-y-0 md:-translate-y-[0] lg:translate-y-0"
@@ -109,23 +161,31 @@ const Hero = () => {
               Trusted by 500+ families
             </motion.div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="font-display text-4xl font-lg md:text-5xl lg:text-[5rem] font-900 text-foreground leading-[1.1] mb-6 text-balance"
-            >
-              Building a{" "}
-              <span className="gradient-text" id="type">
-                Complete Child
-              </span>
-            </motion.h1>
+            {/* FIXED HEIGHT HEADING CONTAINER */}
+            <div className="relative h-[6rem] lg:h-[8rem] mb-6">
+              <h1 className="font-display text-4xl md:text-5xl lg:text-[5rem] font-900 text-foreground leading-[1.1]">
+                <span className="inline-block">
+                  {displayText}
+                </span>
+                <span className="cursor">|</span>{" "}
+                {showCompleteChild && (
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="gradient-text"
+                  >
+                    Complete Child
+                  </motion.span>
+                )}
+              </h1>
+            </div>
 
             <motion.p
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="font-display text-base md:text-lg mb-10 leading-relaxed"
+              className="font-display text-base md:text-lg mb-10 leading-relaxed lg:pt-5"
             >
               We create safe, evidence-based environments where children explore,
               grow, and discover their limitless potential through structured
@@ -182,7 +242,7 @@ const Hero = () => {
           >
             <div
               ref={rightContainerRef}
-              className="relative rounded-3xl overflow-hidden shadow-elevated aspect-[4/5] translate-x-0"
+              className="relative rounded-3xl overflow-hidden shadow-elevated aspect-[4/5]"
             >
               {[Childfour, Childthree, Childfive, Childsix, Childseven].map((img, index) => (
                 <img
@@ -196,21 +256,6 @@ const Hero = () => {
 
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 via-transparent to-transparent" />
             </div>
-
-            {/* Floating badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.5 }}
-              className="absolute -bottom-6 -left-6 bg-card border border-border rounded-2xl p-5 shadow-elevated"
-            >
-              <div className="font-display font-800 text-2xl text-primary">
-                15+
-              </div>
-              <div className="font-body text-sm">
-                Years of Excellence
-              </div>
-            </motion.div>
           </motion.div>
 
         </div>

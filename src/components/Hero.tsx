@@ -8,6 +8,9 @@ import Childsix from "@/assets/images/childsix.jpeg";
 import Childseven from "@/assets/images/childseven.jpeg";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const stats = [
   { value: 500, suffix: "+", label: "Children Supported" },
@@ -16,69 +19,75 @@ const stats = [
 ];
 
 const Hero = () => {
+  const leftContent = useRef(null);
+  const rightContentRef = useRef([]);
+  const rightContainerRef = useRef(null);
 
   // Typing effect
   const fullText = "Building a";
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [index, setIndex] = useState(0);
+  const [showCompleteChild, setShowCompleteChild] = useState(false);
 
   useEffect(() => {
     const typingSpeed = isDeleting ? 50 : 100;
+
     const timeout = setTimeout(() => {
       if (!isDeleting) {
         setDisplayText(fullText.slice(0, index + 1));
         setIndex(index + 1);
-        if (index + 1 === fullText.length) setTimeout(() => setIsDeleting(true), 800);
+
+        if (index + 1 === fullText.length) {
+          setTimeout(() => setIsDeleting(true), 1000);
+          setShowCompleteChild(true);
+        }
       } else {
         setDisplayText(fullText.slice(0, index - 1));
         setIndex(index - 1);
-        if (index - 1 === 0) setIsDeleting(false);
+
+        if (index - 1 === 0) {
+          setIsDeleting(false);
+          setShowCompleteChild(false);
+        }
       }
     }, typingSpeed);
+
     return () => clearTimeout(timeout);
   }, [index, isDeleting]);
 
   // Left content animation
-  const leftContent = useRef(null);
   useEffect(() => {
     gsap.from(leftContent.current, { y: 50, duration: 2, ease: "power3.out" });
   }, []);
 
   // Right content slider
-  const rightContentRef = useRef([]);
-  const rightContainerRef = useRef(null);
-
   useEffect(() => {
     const images = rightContentRef.current;
 
-    gsap.set(images, {
-      xPercent: 100,
-      opacity: 0,
-      position: "absolute",
-    });
-
+    gsap.set(images, { xPercent: 100, opacity: 0, position: "absolute" });
     gsap.set(images[0], { xPercent: 0, opacity: 1 });
 
-    const tl = gsap.timeline({ repeat: -1, defaults: { ease: "power3.inOut" } });
+    const tl = gsap.timeline({
+      repeat: -1,
+      scrollTrigger: {
+        trigger: rightContainerRef.current,
+        start: "top 80%",
+        toggleActions: "play none none none",
+      },
+    });
 
     images.forEach((img, i) => {
       const next = images[(i + 1) % images.length];
-
-      // Slide out current image while sliding in next image
-      tl.to(img, { xPercent: -100, opacity: 0, duration: 1 })
-        .fromTo(next, { xPercent: 100, opacity: 0 }, { xPercent: 0, opacity: 1, duration: 1 }, "<")
-        // Pause while next image is visible
-        .to(next, { duration: 2 });
+      tl.to(img, { xPercent: -100, opacity: 0, duration: 1, ease: "power3.inOut" })
+        .fromTo(next, { xPercent: 100, opacity: 0 }, { xPercent: 0, opacity: 1, duration: 1, ease: "power3.inOut" }, "<")
+        .to({}, { duration: 2 });
     });
-
-    return () => tl.kill();
   }, []);
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-green-light pt-24 pb-16">
-
-      {/* Subtle pattern overlay */}
+      {/* Background pattern */}
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
@@ -102,22 +111,29 @@ const Hero = () => {
               Trusted by 500+ families
             </motion.div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="font-display text-4xl md:text-5xl lg:text-[5rem] font-900 text-foreground leading-[1.1] mb-6 text-balance"
-            >
-              {displayText}
-              <span className="animate-pulse ml-1">|</span>{" "}
-              <span className="gradient-text">Complete Child</span>
-            </motion.h1>
+            {/* Typing effect with fixed height to prevent shifting */}
+            <div className="relative h-[6rem] lg:h-[8rem] mb-6">
+              <h1 className="font-display text-4xl md:text-5xl lg:text-[5rem] font-900 text-foreground leading-[1.1]">
+                <span className="inline-block">{displayText}</span>
+                <span className="inline-block animate-pulse ml-1">|</span>{" "}
+                {showCompleteChild && (
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="gradient-text"
+                  >
+                    Complete Child
+                  </motion.span>
+                )}
+              </h1>
+            </div>
 
             <motion.p
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="font-display text-base md:text-lg mb-10 leading-relaxed"
+              className="font-display text-base md:text-lg mb-10 leading-relaxed lg:py-5"
             >
               We create safe, evidence-based environments where children explore,
               grow, and discover their limitless potential through structured
@@ -130,14 +146,22 @@ const Hero = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <a href="#contact" className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-display font-600 text-base px-7 py-3.5 rounded-xl shadow-card hover:shadow-elevated hover:translate-y-[-2px] transition-all duration-300">
+              <a
+                href="#contact"
+                className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-display font-600 text-base px-7 py-3.5 rounded-xl shadow-card hover:shadow-elevated hover:translate-y-[-2px] transition-all duration-300"
+              >
                 Get Started <ArrowRight size={16} />
               </a>
-              <a href="#about" className="inline-flex items-center justify-center gap-2 bg-card border border-border text-foreground font-display font-600 text-base px-7 py-3.5 rounded-xl shadow-soft hover:shadow-card hover:translate-y-[-2px] transition-all duration-300">
+
+              <a
+                href="#about"
+                className="inline-flex items-center justify-center gap-2 bg-card border border-border text-foreground font-display font-600 text-base px-7 py-3.5 rounded-xl shadow-soft hover:shadow-card hover:translate-y-[-2px] transition-all duration-300"
+              >
                 Learn More
               </a>
             </motion.div>
 
+            {/* Stats */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -157,22 +181,25 @@ const Hero = () => {
             </motion.div>
           </div>
 
-          {/* Right image slider */}
+          {/* Right image slider with 15+ badge */}
           <motion.div className="relative lg:block">
-            <div ref={rightContainerRef} className="relative rounded-3xl overflow-hidden shadow-elevated aspect-[4/5] translate-x-0">
-              {[Childfour, Childthree, Childfive, Childsix, Childseven].map((img, idx) => (
+            <div
+              ref={rightContainerRef}
+              className="relative rounded-3xl overflow-hidden shadow-elevated aspect-[4/5]"
+            >
+              {[Childfour, Childthree, Childfive, Childsix, Childseven].map((img, index) => (
                 <img
-                  key={idx}
+                  key={index}
                   src={img}
-                  alt={`slide-${idx}`}
+                  alt={`slide-${index}`}
                   className="absolute inset-0 w-full h-full object-cover"
-                  ref={(el) => (rightContentRef.current[idx] = el)}
+                  ref={(el) => (rightContentRef.current[index] = el)}
                 />
               ))}
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 via-transparent to-transparent" />
             </div>
 
-            {/* Floating badge */}
+            {/* Floating 15+ Years of Excellence badge */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

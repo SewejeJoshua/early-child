@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import Earlylogo from "@/assets/early-logo.jpeg";
+import Earlylogo from "@/assets/images/early-logo.jpeg";
 
 const navLinks = [
   { label: "About", href: "#about" },

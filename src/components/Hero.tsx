@@ -2,9 +2,9 @@ import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import heroImage from "@/assets/hero-children.jpg";
 import CountUp from "@/components/animations/CountUp";
-import Childthree from "@/assets/childthree.jpeg";
+import Childthree from "@/assets/childthree.jpeg"; 
 import {useEffect, useRef} from "react";
-import gsap from "gsap";
+import { gsap } from "gsap";
 
 const stats = [
   { value: 500, suffix: "+", label: "Children Supported" },
@@ -30,12 +30,14 @@ const Hero = () => {
 
     //animation right content
 
-    const rightContent = useRef(null);
+    const rightContentRef = useRef([]);
 
     useEffect(() => {
-        gsap.from(rightContent.current, {
+        gsap.from(rightContentRef.current, {
           x: 50,
-          duration: 2,
+          duration: 1, 
+          stagger: 0.4,     // this makes them come one after the other
+          ease: "power3.out"
         });
     }, []);
  
@@ -128,12 +130,16 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="relative  lg:block"
           >
-            <div className="relative rounded-3xl overflow-hidden shadow-elevated aspect-[4/5] translate-x-0" ref={rightContent}>
-              <img
-                src={Childthree}
-                alt="Children engaged in learning activities"
+            <div className="relative rounded-3xl overflow-hidden shadow-elevated aspect-[4/5] translate-x-0">
+              {[Childthree, Childtwo].map((img, index) => (
+                <img
+                key={index}
+                src={img}
+                alt={`slide-${index}`}
                 className="w-full h-full object-cover"
+                ref={(el) => (rightContentRef.current[index] = el)}
               />
+              ))}
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 via-transparent to-transparent" />
             </div>
             {/* Floating badge */}

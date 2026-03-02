@@ -29,13 +29,13 @@ const About = () => {
           {/* Left heading */}
           <div>
             <ScrollReveal>
-              <span className="inline-flex   items-center gap-2 bg-secondary text-secondary-foreground font-body font-500 text-xs uppercase tracking-wider px-3 py-1.5 rounded-md mb-6">
+              <span className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground font-body font-500 text-xs uppercase tracking-wider px-3 py-1.5 rounded-md mb-6">
                 About Us
               </span>
             </ScrollReveal>
 
             <ScrollReveal delay={0.1}>
-              <h2 className="font-display  text-3xl md:text-4xl font-800 leading-tight mb-6 text-balance">
+              <h2 className="font-display text-3xl md:text-4xl font-800 leading-tight mb-6 text-balance">
                 Every Child Deserves a Strong Start
               </h2>
             </ScrollReveal>
@@ -78,12 +78,11 @@ const About = () => {
               <motion.div
                 key={item.title}
                 variants={{
-                  hidden: { opacity: 0, x: 80 },
+                  hidden: { opacity: 0 },
                   visible: {
                     opacity: 1,
-                    x: 0,
                     transition: {
-                      duration: 0.6,
+                      duration: 1.2, // slower fade
                       ease: "easeOut",
                     },
                   },

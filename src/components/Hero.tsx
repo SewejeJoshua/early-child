@@ -56,7 +56,7 @@ const Hero = () => {
     return () => clearTimeout(timeout);
   }, [index, isDeleting]);
 
-  // Left content animation
+  // Left animation
   useEffect(() => {
     gsap.from(leftContent.current, {
       y: 50,
@@ -65,7 +65,7 @@ const Hero = () => {
     });
   }, []);
 
-  // Right content slider
+  // Image slider
   useEffect(() => {
     const images = rightContentRef.current;
 
@@ -112,7 +112,6 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-green-light pt-24 pb-16">
-      {/* Background pattern */}
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
@@ -123,7 +122,8 @@ const Hero = () => {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left Content */}
+          
+          {/* LEFT SIDE */}
           <div ref={leftContent} className="max-w-xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -135,28 +135,28 @@ const Hero = () => {
               Trusted by 500+ families
             </motion.div>
 
-            {/* Responsive Typing Section */}
-            <div className="relative min-h-[4.5rem] sm:min-h-[5.5rem] md:min-h-[6.5rem] lg:min-h-[8rem] mb-6">
-              <h1 className="font-display font-900 text-foreground leading-[1.1]
-                             text-3xl sm:text-4xl md:text-5xl lg:text-[5rem]">
+            {/* STABLE TYPING SECTION */}
+            <div className="relative mb-6">
+              <h1
+                className="font-display font-900 text-foreground leading-[1.1]
+                           text-3xl sm:text-4xl md:text-5xl lg:text-[5rem]
+                           min-h-[2.6em]"
+              >
                 <span className="whitespace-nowrap">
                   {displayText}
                 </span>
 
-                <span className="inline-block w-2 animate-pulse">
-                  |
+                <span className="inline-block w-3">
+                  <span className="animate-pulse">|</span>
                 </span>{" "}
 
-                {showCompleteChild && (
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="gradient-text block sm:inline"
-                  >
-                    Complete Child
-                  </motion.span>
-                )}
+                <motion.span
+                  animate={{ opacity: showCompleteChild ? 1 : 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="gradient-text inline"
+                >
+                  Complete Child
+                </motion.span>
               </h1>
             </div>
 
@@ -179,20 +179,20 @@ const Hero = () => {
             >
               <a
                 href="#contact"
-                className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground text-base px-7 py-3.5 rounded-xl shadow-card hover:shadow-elevated hover:-translate-y-1 transition-all duration-300"
+                className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground text-base px-7 py-3.5 rounded-xl shadow-card hover:-translate-y-1 transition-all duration-300"
               >
                 Get Started <ArrowRight size={16} />
               </a>
 
               <a
                 href="#about"
-                className="inline-flex items-center justify-center gap-2 bg-card border border-border text-foreground text-base px-7 py-3.5 rounded-xl shadow-soft hover:shadow-card hover:-translate-y-1 transition-all duration-300"
+                className="inline-flex items-center justify-center gap-2 bg-card border border-border text-foreground text-base px-7 py-3.5 rounded-xl shadow-soft hover:-translate-y-1 transition-all duration-300"
               >
                 Learn More
               </a>
             </motion.div>
 
-            {/* Stats */}
+            {/* STATS */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -212,7 +212,7 @@ const Hero = () => {
             </motion.div>
           </div>
 
-          {/* Right Image Slider */}
+          {/* RIGHT SIDE */}
           <motion.div className="relative lg:block">
             <div
               ref={rightContainerRef}
@@ -232,21 +232,17 @@ const Hero = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 via-transparent to-transparent" />
             </div>
 
-            {/* 15+ Badge */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.5 }}
               className="absolute -bottom-6 -left-6 bg-card border border-border rounded-2xl p-5 shadow-elevated"
             >
-              <div className="text-2xl font-800 text-primary">
-                15+
-              </div>
-              <div className="text-sm">
-                Years of Excellence
-              </div>
+              <div className="text-2xl font-800 text-primary">15+</div>
+              <div className="text-sm">Years of Excellence</div>
             </motion.div>
           </motion.div>
+
         </div>
       </div>
     </section>

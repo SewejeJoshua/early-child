@@ -7,6 +7,10 @@ import {
   ArrowUpRight,
   ChevronDown,
   ChevronUp,
+  RotateCw,
+  Wind,
+  Lightbulb,
+  PiggyBank,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ScrollReveal from "@/components/animations/ScrollReveal";
@@ -19,10 +23,10 @@ const services = [
     tag: "Core",
   },
   {
-    icon: Users,
+    icon: PiggyBank,
     title: "E-SAV",
     desc: "Smart saving for your child’s future—building financial security from their earliest years.",
-    tag: "Family",
+    tag: "Savings",
   },
   {
     icon: Brain,
@@ -31,20 +35,20 @@ const services = [
     tag: "Growth",
   },
   {
-    icon: Globe,
+    icon: RotateCw,
     title: "E-SLC",
     desc: "Celebrating milestones and inspiring the next steps for young learners and their families.",
     tag: "Transition",
   },
   
   {
-    icon: Globe,
+    icon: Wind,
     title: "E-SMME",
     desc: "Making self-learning fun and simple—helping children explore, practice, and grow at their own pace.",
     tag: "Independence",
   },
   {
-    icon: Globe,
+    icon: Lightbulb,
     title: "E-MAG",
     desc: "Inspiring parents, educators, and young minds with ideas, tips, and stories for early learning success.",
     tag: "Insight",

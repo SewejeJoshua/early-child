@@ -13,8 +13,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 const stats = [
-  { value: 500, suffix: "+", label: "Children Supported" },
-  { value: 15, suffix: "+", label: "Years Experience" },
+  { value: 3000, suffix: "+", label: "Children Supported" },
+  { value: 14, suffix: "+", label: "Years Experience" },
   { value: 98, suffix: "%", label: "Parent Satisfaction" },
 ];
 
@@ -24,7 +24,8 @@ const Hero = () => {
   const rightContainerRef = useRef(null);
 
   // Typing effect
-  const fullText = "Building a";
+  const fullText = "Building a ";
+  const fullSentence = "Building a Complete Child"; // reserve full width
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [index, setIndex] = useState(0);
@@ -32,12 +33,10 @@ const Hero = () => {
 
   useEffect(() => {
     const typingSpeed = isDeleting ? 50 : 100;
-
     const timeout = setTimeout(() => {
       if (!isDeleting) {
         setDisplayText(fullText.slice(0, index + 1));
         setIndex(index + 1);
-
         if (index + 1 === fullText.length) {
           setTimeout(() => setIsDeleting(true), 1000);
           setShowCompleteChild(true);
@@ -45,14 +44,12 @@ const Hero = () => {
       } else {
         setDisplayText(fullText.slice(0, index - 1));
         setIndex(index - 1);
-
         if (index - 1 === 0) {
           setIsDeleting(false);
           setShowCompleteChild(false);
         }
       }
     }, typingSpeed);
-
     return () => clearTimeout(timeout);
   }, [index, isDeleting]);
 
@@ -68,18 +65,8 @@ const Hero = () => {
   // Image slider
   useEffect(() => {
     const images = rightContentRef.current;
-
-    gsap.set(images, {
-      xPercent: 100,
-      opacity: 0,
-      position: "absolute",
-    });
-
-    gsap.set(images[0], {
-      xPercent: 0,
-      opacity: 1,
-    });
-
+    gsap.set(images, { xPercent: 100, opacity: 0, position: "absolute" });
+    gsap.set(images[0], { xPercent: 0, opacity: 1 });
     const tl = gsap.timeline({
       repeat: -1,
       scrollTrigger: {
@@ -88,25 +75,12 @@ const Hero = () => {
         toggleActions: "play none none none",
       },
     });
-
     images.forEach((img, i) => {
       const next = images[(i + 1) % images.length];
-
-      tl.to(img, {
-        xPercent: -100,
-        opacity: 0,
-        duration: 1,
-        ease: "power3.inOut",
-      })
-        .fromTo(
-          next,
-          { xPercent: 100, opacity: 0 },
-          { xPercent: 0, opacity: 1, duration: 1, ease: "power3.inOut" },
-          "<"
-        )
+      tl.to(img, { xPercent: -100, opacity: 0, duration: 1, ease: "power3.inOut" })
+        .fromTo(next, { xPercent: 100, opacity: 0 }, { xPercent: 0, opacity: 1, duration: 1, ease: "power3.inOut" }, "<")
         .to({}, { duration: 2 });
     });
-
     ScrollTrigger.refresh();
   }, []);
 
@@ -121,10 +95,9 @@ const Hero = () => {
       />
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          
+        <div className="grid lg:grid-cols-2 gap-16 items-start">
           {/* LEFT SIDE */}
-          <div ref={leftContent} className="max-w-xl">
+          <div ref={leftContent} className="max-w-xl w-full relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -135,31 +108,28 @@ const Hero = () => {
               Trusted by 500+ families
             </motion.div>
 
-            {/* STABLE TYPING SECTION */}
-            <div className="relative mb-6">
-              <h1
-                className="font-display font-900 text-foreground leading-[1.1]
-                           text-3xl sm:text-4xl md:text-5xl lg:text-[5rem]
-                           min-h-[2.6em]"
-              >
-                <span className="whitespace-nowrap">
+            {/* TYPING SECTION */}
+            <div className="relative mb-6 min-h-[6rem] lg:min-h-[8rem]">
+              {/* Invisible full sentence to reserve height */}
+              <span className="invisible absolute pointer-events-none font-display font-900 text-foreground leading-[1.1] text-3xl sm:text-4xl md:text-5xl lg:text-[5rem]">
+                {fullSentence}
+              </span>
+
+              {/* Typing container: responsive, wrap on small screens */}
+              <h1 className="absolute top-0 left-0 font-display font-900 text-foreground leading-[1.1] text-3xl sm:text-4xl md:text-5xl lg:text-[4rem] xl:text[5rem] w-full break-words">
+                <span className="inline-block">
                   {displayText}
+                  <span className="inline-block w-3">
+                    <span className="animate-pulse">|</span>
+                  </span>
+                  {showCompleteChild && (
+                    <span className="gradient-text ml-1">Complete Child</span>
+                  )}
                 </span>
-
-                <span className="inline-block w-3">
-                  <span className="animate-pulse">|</span>
-                </span>{" "}
-
-                <motion.span
-                  animate={{ opacity: showCompleteChild ? 1 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="gradient-text inline"
-                >
-                  Complete Child
-                </motion.span>
               </h1>
             </div>
 
+            {/* STATIC PARAGRAPH */}
             <motion.p
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -213,7 +183,7 @@ const Hero = () => {
           </div>
 
           {/* RIGHT SIDE */}
-          <motion.div className="relative lg:block">
+          <motion.div className="relative lg:block z-0">
             <div
               ref={rightContainerRef}
               className="relative rounded-3xl overflow-hidden shadow-elevated aspect-[4/5]"
@@ -238,11 +208,10 @@ const Hero = () => {
               transition={{ delay: 0.8, duration: 0.5 }}
               className="absolute -bottom-6 -left-6 bg-card border border-border rounded-2xl p-5 shadow-elevated"
             >
-              <div className="text-2xl font-800 text-primary">15+</div>
+              <div className="text-2xl font-800 text-primary">14+</div>
               <div className="text-sm">Years of Excellence</div>
             </motion.div>
           </motion.div>
-
         </div>
       </div>
     </section>

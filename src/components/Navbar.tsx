@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Earlylogo from "@/assets/images/early-logo.jpeg";
+import { Link } from "react-router-dom";
+import { HashLink } from "react-router-hash-link"; // ✅ Smooth scroll links
 
 const navLinks = [
-  { label: "About", href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Testimonials", href: "#testimonials" }, 
+  { label: "About", href: "/#about" },
+  { label: "Services", href: "/#services" },
+  { label: "Testimonials", href: "/#testimonials" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 const Navbar = () => {
@@ -31,34 +34,49 @@ const Navbar = () => {
       }`}
     >
       <div className="container mx-auto flex items-center justify-between py-4 px-4">
-        <a href="#" className="flex items-center gap-2.5 group">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2.5 group">
           <div className="w-9 h-9 rounded-lg flex items-center justify-center">
-            <div className="text-primary-foreground font-display font-800 text-sm"><img src={Earlylogo} className="rounded-full" /></div>
+            <img src={Earlylogo} className="rounded-full" alt="Logo" />
           </div>
           <span className="font-display text-lg font-700 text-foreground tracking-tight">
             Early Childhood
           </span>
-        </a>
+        </Link>
 
-        {/* Desktop */}
+        {/* Desktop Menu */}
         <ul className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => (
             <li key={link.href}>
-              <a
-                href={link.href}
+              <HashLink
+                smooth
+                to={link.href}
                 className="font-body font-500 text-muted-foreground hover:text-foreground px-4 py-2 rounded-lg hover:bg-muted transition-all duration-200 text-sm"
               >
                 {link.label}
-              </a>
+              </HashLink>
             </li>
           ))}
+
+          {/* Gallery Link */}
           <li className="ml-4">
-            <a
-              href="#contact"
+            <Link
+              to="/gallery"
+              className="font-body font-500 text-muted-foreground hover:text-foreground px-4 py-2 rounded-lg hover:bg-muted transition-all duration-200 text-sm"
+            >
+              Gallery
+            </Link>
+          </li>
+
+          {/* Contact / Get Started */}
+          <li className="ml-4">
+            <HashLink
+              smooth
+              to="/#contact"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-display font-600 text-sm px-5 py-2.5 rounded-lg hover:opacity-90 transition-opacity"
             >
-              Contact Us<ArrowRight size={14} />
-            </a>
+              Contact Us <ArrowRight size={14} />
+            </HashLink>
           </li>
         </ul>
 
@@ -72,7 +90,7 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -90,23 +108,38 @@ const Navbar = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.05 }}
                 >
-                  <a
-                    href={link.href}
+                  <HashLink
+                    smooth
+                    to={link.href}
                     className="block font-body font-500 text-muted-foreground hover:text-foreground hover:bg-muted px-4 py-3 rounded-lg transition-all text-base"
                     onClick={() => setOpen(false)}
                   >
                     {link.label}
-                  </a>
+                  </HashLink>
                 </motion.li>
               ))}
+
+              {/* Gallery Link */}
+              <li>
+                <Link
+                  to="/gallery"
+                  className="block font-body font-500 text-muted-foreground hover:text-foreground hover:bg-muted px-4 py-3 rounded-lg transition-all text-base"
+                  onClick={() => setOpen(false)}
+                >
+                  Gallery
+                </Link>
+              </li>
+
+              {/* Get Started / Contact */}
               <li className="mt-4 px-4">
-                <a
-                  href="#contact"
+                <HashLink
+                  smooth
+                  to="/#contact"
                   className="block text-center bg-primary text-primary-foreground font-display font-600 text-sm px-5 py-3 rounded-lg"
                   onClick={() => setOpen(false)}
                 >
                   Get Started
-                </a>
+                </HashLink>
               </li>
             </ul>
           </motion.div>

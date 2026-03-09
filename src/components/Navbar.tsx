@@ -71,17 +71,7 @@ const Navbar = () => {
           </li>
 
 
-          <li className="ml-1">
-            <HashLink
-              to="/#team"
-              onClick={() =>
-                window.scrollTo({ top: 0, behavior: "smooth" })
-              }
-              className="font-body font-500 text-muted-foreground hover:text-foreground px-4 py-2 rounded-lg hover:bg-muted transition-all duration-200 text-sm"
-            >
-              Team
-            </HashLink>
-          </li>
+         
 
           {/* Contact / Get Started */}
           <li className="ml-4">
@@ -136,8 +126,8 @@ const Navbar = () => {
 
               {/* Gallery Link */}
               <li>
-                <Link smooth
-                  to="/#gallery"
+                <HashLink smooth
+                  to="/gallery"
                   className="block font-body font-500 text-muted-foreground hover:text-foreground hover:bg-muted px-4 py-3 rounded-lg transition-all text-base"
                   onClick={() => {
                     setOpen(false);
@@ -145,21 +135,10 @@ const Navbar = () => {
                   }}
                 >
                   Gallery
-                </Link>
-              </li>
-                
-                <li>
-                <HashLink
-                  to="/#team"
-                  className="block font-body font-500 text-muted-foreground hover:text-foreground hover:bg-muted px-4 py-3 rounded-lg transition-all text-base"
-                  onClick={() => {
-                    setOpen(false);
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                >
-                  Team
                 </HashLink>
               </li>
+                
+                 
 
 
               

@@ -136,8 +136,8 @@ const Navbar = () => {
 
               {/* Gallery Link */}
               <li>
-                <Link
-                  to="/gallery"
+                <Link smooth
+                  to="/#gallery"
                   className="block font-body font-500 text-muted-foreground hover:text-foreground hover:bg-muted px-4 py-3 rounded-lg transition-all text-base"
                   onClick={() => {
                     setOpen(false);

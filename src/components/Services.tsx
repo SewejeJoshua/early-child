@@ -46,7 +46,6 @@ const services = [
     desc: "Celebrating milestones and inspiring the next steps for young learners and their families.",
     tag: "Transition",
   },
-  
   {
     icon: Clipboard,
     title: "E-SMME",
@@ -103,10 +102,20 @@ const Services = () => {
   const firstSix = services.slice(0, 6);
   const lastSix = services.slice(6);
 
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   const renderCard = (service, index) => (
-    <div
+    <motion.div
       key={index}
-      className="bg-card rounded-2xl p-8 border border-border shadow-soft hover:shadow-card hover:translate-y-[-4px] transition-all duration-400 group h-full flex flex-col"
+      variants={cardVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.6, delay: index * 0.15, ease: "easeOut" }}
+      className="bg-card rounded-2xl p-8 border border-border shadow-soft hover:shadow-card hover:-translate-y-1 transition-all duration-400 group h-full flex flex-col"
     >
       <div className="flex items-start justify-between mb-6">
         <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center group-hover:bg-primary transition-colors duration-300">
@@ -115,7 +124,6 @@ const Services = () => {
             className="text-primary group-hover:text-primary-foreground transition-colors duration-300"
           />
         </div>
-
         <span className="font-body text-xs font-500 text-muted-foreground bg-muted px-2.5 py-1 rounded-md">
           {service.tag}
         </span>
@@ -132,7 +140,7 @@ const Services = () => {
       <p className="font-body text-sm text-muted-foreground leading-relaxed flex-1">
         {service.desc}
       </p>
-    </div>
+    </motion.div>
   );
 
   return (
@@ -162,23 +170,13 @@ const Services = () => {
 
         {/* Grid */}
         <div className="grid sm:grid-cols-3 gap-6">
-          {/* First 6 always visible */}
           {firstSix.map(renderCard)}
 
-          {/* AnimatePresence for last 6 */}
           <AnimatePresence>
             {showAll &&
-              lastSix.map((service, index) => (
-                <motion.div
-                  key={index + 6}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {renderCard(service, index + 6)}
-                </motion.div>
-              ))}
+              lastSix.map((service, index) =>
+                renderCard(service, index + 6)
+              )}
           </AnimatePresence>
         </div>
 

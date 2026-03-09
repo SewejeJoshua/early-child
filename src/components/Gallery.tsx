@@ -3,7 +3,6 @@ import { X, Play } from "lucide-react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import About from "@/components/About";
 
 import Img1 from "@/assets/images/childfive.jpeg";
 import Img2 from "@/assets/images/childfour.jpeg";
@@ -15,9 +14,9 @@ const pictures = [
   { src: Img2, title: "Group Activities", desc: "Learning together as a community." },
   { src: Img3, title: "Outdoor Fun", desc: "Healthy outdoor engagement." },
   { src: Img4, title: "Classroom Moments", desc: "Interactive classroom learning." },
-  { src: Img4, title: "Classroom Moments", desc: "Interactive classroom learning." },
-  { src: Img4, title: "Classroom Moments", desc: "Interactive classroom learning." },
-  { src: Img4, title: "Classroom Moments", desc: "Interactive classroom learning." },
+  { src: Img1, title: "Creative Learning", desc: "Children exploring creative play." },
+  { src: Img2, title: "Group Activities", desc: "Learning together as a community." },
+  { src: Img3, title: "Outdoor Fun", desc: "Healthy outdoor engagement." },
   { src: Img4, title: "Classroom Moments", desc: "Interactive classroom learning." },
 ];
 
@@ -74,24 +73,25 @@ const Gallery = () => {
               Pictures
             </h3>
 
+            {/* Masonry Layout */}
             <motion.div
               variants={container}
               initial="hidden"
               animate="show"
-              className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
+              className="columns-1 sm:columns-2 lg:columns-4 gap-6 space-y-6"
             >
               {pictures.map((img, index) => (
                 <motion.div
                   key={index}
                   variants={item}
                   whileHover={{ scale: 1.03 }}
-                  className="relative overflow-hidden rounded-xl cursor-pointer group"
+                  className="relative overflow-hidden rounded-xl cursor-pointer group break-inside-avoid"
                   onClick={() => setActiveImage(img)}
                 >
                   <img
                     src={img.src}
                     alt={img.title}
-                    className="w-full h-[220px] object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="w-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
 
                   {/* Hover Overlay */}
@@ -134,7 +134,6 @@ const Gallery = () => {
                     className="w-full h-[220px] object-cover"
                   />
 
-                  {/* Play Button */}
                   <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition">
                     <Play size={40} className="text-white" />
                   </div>

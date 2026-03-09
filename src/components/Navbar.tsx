@@ -3,13 +3,12 @@ import { Menu, X, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Earlylogo from "@/assets/images/early-logo.jpeg";
 import { Link } from "react-router-dom";
-import { HashLink } from "react-router-hash-link"; // ✅ Smooth scroll links
+import { HashLink } from "react-router-hash-link";
 
 const navLinks = [
   { label: "About", href: "/#about" },
   { label: "Services", href: "/#services" },
-  { label: "Testimonials", href: "/#testimonials" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Testimonials", href: "/#testimonials" }, 
 ];
 
 const Navbar = () => {
@@ -59,13 +58,29 @@ const Navbar = () => {
           ))}
 
           {/* Gallery Link */}
-          <li className="ml-4">
+          <li className="ml-1">
             <Link
               to="/gallery"
+              onClick={() =>
+                window.scrollTo({ top: 0, behavior: "smooth" })
+              }
               className="font-body font-500 text-muted-foreground hover:text-foreground px-4 py-2 rounded-lg hover:bg-muted transition-all duration-200 text-sm"
             >
               Gallery
             </Link>
+          </li>
+
+
+          <li className="ml-1">
+            <HashLink
+              to="/#team"
+              onClick={() =>
+                window.scrollTo({ top: 0, behavior: "smooth" })
+              }
+              className="font-body font-500 text-muted-foreground hover:text-foreground px-4 py-2 rounded-lg hover:bg-muted transition-all duration-200 text-sm"
+            >
+              Team
+            </HashLink>
           </li>
 
           {/* Contact / Get Started */}
@@ -124,11 +139,30 @@ const Navbar = () => {
                 <Link
                   to="/gallery"
                   className="block font-body font-500 text-muted-foreground hover:text-foreground hover:bg-muted px-4 py-3 rounded-lg transition-all text-base"
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    setOpen(false);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
                 >
                   Gallery
                 </Link>
               </li>
+                
+                <li>
+                <HashLink
+                  to="/#team"
+                  className="block font-body font-500 text-muted-foreground hover:text-foreground hover:bg-muted px-4 py-3 rounded-lg transition-all text-base"
+                  onClick={() => {
+                    setOpen(false);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                >
+                  Team
+                </HashLink>
+              </li>
+
+
+              
 
               {/* Get Started / Contact */}
               <li className="mt-4 px-4">

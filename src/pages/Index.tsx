@@ -6,7 +6,7 @@ import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import Team from "@/components/Team";
-import Gallery from "@/components/Gallery";
+import Gallery from "@/components/Gallery"; 
 
 const Index = () => {
   return (

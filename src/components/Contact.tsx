@@ -5,10 +5,32 @@ import ScrollReveal from "@/components/animations/ScrollReveal";
 
 const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("subject", subject);
+    formData.append("message", message);
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_ECHILDHOOD_API}/api/contact/`, {
+      method: "POST",
+      body: formData,
+    });
+      
+    }catch (error) {
+      console.error("Error sending contact form:", error);
+    } finally {
+      console.log([...formData]);
+    }
   };
 
   const inputClasses = "w-full px-4 py-3 rounded-xl border border-input bg-background font-body text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200 text-sm";
@@ -77,16 +99,24 @@ const Contact = () => {
                     <div className="grid sm:grid-cols-2 gap-5">
                       <div>
                         <label className="block font-display font-600 text-foreground text-xs mb-2 uppercase tracking-wider">Name</label>
-                        <input type="text" required placeholder="Your name" className={inputClasses} />
+                        <input type="text" required placeholder="Your name" className={inputClasses} 
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        />
                       </div>
                       <div>
                         <label className="block font-display font-600 text-foreground text-xs mb-2 uppercase tracking-wider">Email</label>
-                        <input type="email" required placeholder="your@email.com" className={inputClasses} />
+                        <input type="email" required placeholder="your@email.com" className={inputClasses} 
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        />
                       </div>
                     </div>
                     <div>
                       <label className="block font-display font-600 text-foreground text-xs mb-2 uppercase tracking-wider">Subject</label>
-                      <input type="text" required placeholder="How can we help?" className={inputClasses} />
+                      <input type="text" required placeholder="How can we help?" className={inputClasses} 
+                      onChange={(e) => setSubject(e.target.value)}
+                      />
                     </div>
                     <div>
                       <label className="block font-display font-600 text-foreground text-xs mb-2 uppercase tracking-wider">Message</label>
@@ -95,6 +125,8 @@ const Contact = () => {
                         rows={4}
                         placeholder="Tell us more..."
                         className={`${inputClasses} resize-none`}
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
                       />
                     </div>
                     <button

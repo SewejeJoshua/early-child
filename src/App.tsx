@@ -12,6 +12,8 @@ import EarlyAdminLogin from "@/components/admin/EarlyAdminLogin";
 import EarlyAdminDash from "@/components/admin/EarlyAdminDash";
 import DashboardHome from "@/components/admin/DashboardHome";
 import Broadcast from "@/components/admin/Broadcast";
+import Inbox from "@/components/admin/Inbox";
+import BMessage from "@/components/admin/BroadcastedMessage";
 
 const queryClient = new QueryClient();
 
@@ -37,7 +39,8 @@ const App = () => (
 
             <Route path="dashboardhome" element={<DashboardHome />} />
             <Route path="broadcast" element={<Broadcast />} />
-
+            <Route path="inbox" element={<Inbox />} />
+            <Route path="broadcasted" element={<BMessage />} />
           </Route>
 
           {/* Catch-all must ALWAYS be last */}

@@ -56,7 +56,7 @@ const Footer = () => {
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5 mb-5">
               <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-display font-800 text-sm"><img src={Earlylogo} alt="Early Childhood Logo" /></span>
+                <span className="text-primary-foreground font-display font-800 text-sm"><img src={Earlylogo} alt="Early Childhood Logo" className="rounded-lg"/></span>
               </div>
               <span className="font-display text-lg font-700 text-primary-foreground">
                 Early Childhood

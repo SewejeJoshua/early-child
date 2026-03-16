@@ -9,6 +9,7 @@ import {
   UserCircle,
   Home,
   Inbox,
+  Check,
 } from "lucide-react";
 
 const EarlyAdminDash = () => {
@@ -113,7 +114,7 @@ const EarlyAdminDash = () => {
             }
           >
             <Inbox size={18} />
-            Inbox
+           Contact Inbox
           </NavLink>
 
           <NavLink
@@ -124,7 +125,18 @@ const EarlyAdminDash = () => {
             }
           >
             <Megaphone size={18} />
-            Broadcast
+            Broadcasts
+          </NavLink>
+
+          <NavLink
+            to="broadcasted"
+            onClick={() => setOpen(false)}
+            className={({ isActive }) =>
+              `${navItem} ${isActive ? active : inactive}`
+            }
+          >
+            <Check size={18} />
+            Broadcasted 
           </NavLink>
 
           <NavLink

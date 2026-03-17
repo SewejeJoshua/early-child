@@ -178,11 +178,10 @@ const Footer = () => {
                   >
                     {/* Image Section */}
                     <div className="relative h-44 w-full overflow-hidden bg-gray-200">
-                      {item.image && (
+                      {item.image_url && (
                         <>
                           <img
-                            src={item.image}
-                            alt={item.title}
+                            src={item.image_url} 
                             className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
@@ -233,10 +232,9 @@ const Footer = () => {
 
             {/* Image Section */}
             <div className="h-60 mb-6 rounded-xl overflow-hidden bg-gray-100">
-              {selectedItem.image && (
+              {selectedItem.image_url && (
                 <img
-                  src={selectedItem.image}
-                  alt={selectedItem.title}
+                  src={selectedItem.image_url} 
                   className="w-full h-full object-cover"
                 />
               )}

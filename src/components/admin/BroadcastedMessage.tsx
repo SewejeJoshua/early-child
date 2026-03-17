@@ -30,6 +30,7 @@ const BMessage = () => {
       console.error("Failed to fetch messages:", error);
     } finally {
       setLoading(false);
+      console.log([...messages]);
     }
   };
 
@@ -56,13 +57,13 @@ const BMessage = () => {
             >
               {/* ✅ IMAGE SECTION (EXACT LIKE FOOTER) */}
               <div className="relative h-44 w-full overflow-hidden bg-gray-200">
-                {item.image && (
+                {item.image_url && (
                   <>
                     <img
                       src={
-                        item.image.startsWith("http")
-                          ? item.image
-                          : `${import.meta.env.VITE_ECHILDHOOD_API}${item.image}`
+                        item.image_url.startsWith("http")
+                          ? item.image_url
+                          : `${import.meta.env.VITE_ECHILDHOOD_API}${item.image_url}`
                       }
                       alt={item.title}
                       className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"

@@ -115,12 +115,12 @@ const BMessage = () => {
 
             {/* IMAGE */}
             <div className="h-60 mb-6 rounded-xl overflow-hidden bg-gray-100">
-              {selectedItem.image && (
+              {selectedItem.image_url && (
                 <img
                   src={
-                    selectedItem.image.startsWith("http")
-                      ? selectedItem.image
-                      : `${import.meta.env.VITE_ECHILDHOOD_API}${selectedItem.image}`
+                    selectedItem.image_url.startsWith("http")
+                      ? selectedItem.image_url
+                      : `${import.meta.env.VITE_ECHILDHOOD_API}${selectedItem.image_url}`
                   }
                   alt={selectedItem.title}
                   className="w-full h-full object-cover"

@@ -29,8 +29,7 @@ const BMessage = () => {
     } catch (error) {
       console.error("Failed to fetch messages:", error);
     } finally {
-      setLoading(false);
-      console.log([...messages]);
+      setLoading(false); 
     }
   };
 

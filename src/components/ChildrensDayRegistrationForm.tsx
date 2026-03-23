@@ -52,10 +52,7 @@ const ChildrensDayRegistrationForm = () => {
         dataToSend.append("receipt", formData.receipt);
       }
 
-      // DEBUG: check what will be sent
-      for (let pair of dataToSend.entries()) {
-        console.log(pair[0], pair[1]);
-      }
+      
 
       const response = await fetch(`${import.meta.env.VITE_ECHILDHOOD_API}/api/register/`, {
         method: "POST",

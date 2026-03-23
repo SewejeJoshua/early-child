@@ -16,6 +16,7 @@ import Inbox from "@/components/admin/Inbox";
 import BMessage from "@/components/admin/BroadcastedMessage";
 import ChildrensDayRegistrationForm from "@/components/ChildrensDayRegistrationForm";
 import Childadminlogin from "@/components/childrenday/Childadminlogin";
+import Childadmindash from "./components/childrenday/Childadmindash";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -49,9 +50,10 @@ const App = () => (
           </Route>
 
             {/* Childernday */}
- 
+            <Route path="/childrenday/Childadminlogin" element={<Childadminlogin />}>
+              <Route index element={<Childadmindash />} />
             
-             
+          </Route>
              
 
           {/* Catch-all must ALWAYS be last */}

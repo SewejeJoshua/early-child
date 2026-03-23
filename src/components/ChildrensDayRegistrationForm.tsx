@@ -26,6 +26,8 @@ const ChildrensDayRegistrationForm = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const accountNumber = "0058577041";
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFormData({ ...formData, receipt: e.target.files[0] });
@@ -51,7 +53,6 @@ const ChildrensDayRegistrationForm = () => {
       if (formData.receipt) {
         dataToSend.append("receipt", formData.receipt);
       }
-
       
 
       const response = await fetch(`${import.meta.env.VITE_ECHILDHOOD_API}/api/register/`, {
@@ -114,7 +115,24 @@ const ChildrensDayRegistrationForm = () => {
               </div>
               <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-600">
                 <span className="font-medium">Fee:</span> <span className="text-gray-900 font-bold">₦5,000</span>
-                <span className="font-medium">Account:</span> <span className="text-gray-900 font-bold">0058577041</span>
+                <span className="font-medium text-gray-600">Account Number:</span> 
+                      <div 
+                        className="group flex items-center gap-1.5 cursor-pointer rounded-md px-2 py-1 -ml-2 hover:bg-gray-100 transition-colors"
+                        onClick={handleCopy}
+                        title="Click to copy account number"
+                      >
+                        <span className="text-gray-900 font-bold tracking-wider">
+                          {accountNumber}
+                        </span>
+                
+                        {copied ? ( 
+                          <Check className="w-4 h-4 text-green-600" aria-hidden="true" />
+                        ) : (  
+                          <Copy className="w-4 h-4 text-gray-400 group-hover:text-blue-600 opacity-70 group-hover:opacity-100 transition-all" aria-hidden="true" />
+                        )}
+                      </div>
+ 
+      
                 <span className="font-medium">Bank:</span> <span className="text-gray-900">Access Bank</span>
               </div>
             </div>

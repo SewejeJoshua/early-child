@@ -21,6 +21,7 @@ const ChildrensDayRegistrationForm = () => {
   const [token, setToken] = useState("");
   const [fname, setFname] = useState("");
   const [copied, setCopied] = useState(false);
+  const [accountCopied, setAccountCopied] = useState(false); // ✅ separate state
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -64,7 +65,6 @@ const ChildrensDayRegistrationForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // ✅ Use backend-generated pass_code
         setToken(data.pass_code);
         setFname(data.first_name);
         setSubmitted(true);
@@ -86,17 +86,22 @@ const ChildrensDayRegistrationForm = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // ✅ new handler for account number
+  const handleAccountCopy = () => {
+    navigator.clipboard.writeText(accountNumber);
+    setAccountCopied(true);
+    setTimeout(() => setAccountCopied(false), 2000);
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
       {!submitted ? (
         <div className="w-full max-w-xl bg-white rounded-3xl shadow-xl overflow-hidden">
-          {/* HERO IMAGE */}
           <div className="relative h-70 w-full">
             <img src={Chiday} alt="Childrens Day" className="w-full h-45" />
           </div>
 
           <div className="p-6 md:p-8 space-y-6">
-            {/* EVENT DESCRIPTION */}
             <div className="bg-green-50 border-l-4 border-green-500 p-6 rounded-r-lg">
               <p className="text-gray-700 text-sm leading-relaxed text-justify">
                 🎉 <span className="font-bold text-green-700  decoration-green-200">EarlyChildhood Children’s Day 2026 Party!</span> 🎉
@@ -107,37 +112,40 @@ const ChildrensDayRegistrationForm = () => {
               </p>
             </div>
 
-            {/* PAYMENT DETAILS */}
             <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 space-y-3">
               <div className="flex items-center gap-2 text-green-700 font-bold">
                 <Landmark size={18} />
                 <h3>Payment Details</h3>
               </div>
-              <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-600">
-                <span className="font-medium">Fee:</span> <span className="text-gray-900 font-bold">₦5,000</span>
-                <span className="font-medium text-gray-600">Account Number:</span> 
-                      <div 
-                        className="group flex items-center gap-1.5 cursor-pointer rounded-md px-2 py-1 -ml-2 hover:bg-gray-100 transition-colors"
-                        onClick={handleCopy}
-                        title="Click to copy account number"
-                      >
-                        <span className="text-gray-900 font-bold tracking-wider">
-                          {accountNumber}
-                        </span>
-                
-                        {copied ? ( 
-                          <Check className="w-4 h-4 text-green-600" aria-hidden="true" />
-                        ) : (  
-                          <Copy className="w-4 h-4 text-gray-400 group-hover:text-blue-600 opacity-70 group-hover:opacity-100 transition-all" aria-hidden="true" />
-                        )}
-                      </div>
- 
-      
-                <span className="font-medium">Bank:</span> <span className="text-gray-900">Access Bank</span>
+
+              {/* ✅ FIXED GRID ALIGNMENT */}
+              <div className="grid grid-cols-2 gap-y-3 text-sm text-gray-600 items-center">
+                <span className="font-medium">Fee:</span>
+                <span className="text-gray-900 font-bold">₦5,000</span>
+
+                <span className="font-medium">Account Number:</span>
+
+                <div 
+                  className="group flex items-center gap-1.5 cursor-pointer rounded-md px-2 py-1 hover:bg-gray-100 transition-colors w-max"
+                  onClick={handleAccountCopy}
+                  title="Click to copy account number"
+                >
+                  <span className="text-gray-900 font-bold tracking-wider text-base sm:text-lg">
+                    {accountNumber}
+                  </span>
+
+                  {accountCopied ? ( 
+                    <Check className="w-4 h-4 text-green-600 shrink-0" />
+                  ) : (  
+                    <Copy className="w-4 h-4 text-gray-400 group-hover:text-blue-600 opacity-70 group-hover:opacity-100 transition-all shrink-0" />
+                  )}
+                </div>
+
+                <span className="font-medium">Bank:</span>
+                <span className="text-gray-900">Access Bank</span>
               </div>
             </div>
 
-            {/* FORM */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b pb-1">Child's Information</h4>
               <div className="grid grid-cols-2 gap-4">
@@ -200,7 +208,6 @@ const ChildrensDayRegistrationForm = () => {
                 </div>
               </div>
 
-              {/* UPLOAD RECEIPT */}
               <div className="pt-2">
                 <label className="flex items-center justify-between w-full border-2 border-dashed border-gray-300 rounded-xl px-4 py-3 bg-gray-50 cursor-pointer hover:bg-gray-100 transition">
                   <div className="flex items-center gap-3">
@@ -220,7 +227,6 @@ const ChildrensDayRegistrationForm = () => {
           </div>
         </div>
       ) : (
-        /* SUCCESS VIEW */
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 text-center space-y-6">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
             <Check size={40} className="text-green-600" />
@@ -228,11 +234,11 @@ const ChildrensDayRegistrationForm = () => {
           <h2 className="text-2xl font-bold text-gray-900">Yay {fname}! 
           </h2>
           <p className="text-gray-500 text-sm"> You’re all set for the EarlyChildhood Children’s Day 2026 Party!
+            Your special token code is super important — it’s your own VIP key to all the fun, games, and surprises! Keep it safe because if you lose it, you won’t be able to join the fun or enjoy all the goodies, so copy it and keep it somewhere safe until the big day!
 
- 
-              This is your own VIP code — it’s super important! Keep it safe because it’s the key to all the fun, games, and surprises we have for you. If you lose it, you won’t be able to join the fun or get all the goodies, so copy it and keep it somewhere safe until the big day!
+        Can’t wait to see you have a super fun day! 🎈💛 
 
-              We can’t wait to see you shine and have a super fun day! 🎈💛</p>
+          </p>
           
           <div className="bg-gray-50 rounded-2xl p-4 space-y-2 border border-gray-100">
             <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Your Token Code:</span>
@@ -248,10 +254,5 @@ const ChildrensDayRegistrationForm = () => {
     </div>
   );
 };
-
-
-
-
- 
 
 export default ChildrensDayRegistrationForm;

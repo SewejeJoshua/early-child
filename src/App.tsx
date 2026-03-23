@@ -14,7 +14,8 @@ import DashboardHome from "@/components/admin/DashboardHome";
 import Broadcast from "@/components/admin/Broadcast";
 import Inbox from "@/components/admin/Inbox";
 import BMessage from "@/components/admin/BroadcastedMessage";
-
+import ChildrensDayRegistrationForm from "@/components/ChildrensDayRegistrationForm";
+import Childadminlogin from "@/components/childrenday/Childadminlogin";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -32,6 +33,10 @@ const App = () => (
 
           <Route path="/admin" element={<EarlyAdminLogin />} />
 
+          <Route path="/childrensdayregistrationform" element={<ChildrensDayRegistrationForm />} />
+          
+          <Route path="/childrenday" element={<Childadminlogin />} />
+
           {/* ADMIN DASHBOARD WITH NESTED ROUTES */}
           <Route path="/admin/EarlyAdminDash" element={<EarlyAdminDash />}>
 
@@ -42,6 +47,12 @@ const App = () => (
             <Route path="inbox" element={<Inbox />} />
             <Route path="broadcasted" element={<BMessage />} />
           </Route>
+
+            {/* Childernday */}
+ 
+            
+             
+             
 
           {/* Catch-all must ALWAYS be last */}
           <Route path="*" element={<NotFound />} />

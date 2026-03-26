@@ -51,7 +51,7 @@ const Childadmindash = () => {
       localStorage.setItem("logoutMessage", "Logout successful");
 
       // Redirect to login
-      navigate("/admin");
+      navigate("/childrenday");
     }
   };
 
@@ -106,49 +106,22 @@ const Childadmindash = () => {
             Dashboard
           </NavLink>
 
-             <NavLink
-            to="inbox"
-            onClick={() => setOpen(false)}
-            className={({ isActive }) =>
-              `${navItem} ${isActive ? active : inactive}`
-            }
-          >
-            <Inbox size={18} />
-           Contact Inbox
-          </NavLink>
+             
+
+          
 
           <NavLink
-            to="broadcast"
-            onClick={() => setOpen(false)}
-            className={({ isActive }) =>
-              `${navItem} ${isActive ? active : inactive}`
-            }
-          >
-            <Megaphone size={18} />
-            Broadcasts
-          </NavLink>
-
-          <NavLink
-            to="broadcasted"
+            to="registered"
             onClick={() => setOpen(false)}
             className={({ isActive }) =>
               `${navItem} ${isActive ? active : inactive}`
             }
           >
             <Check size={18} />
-            Broadcasted 
+            Registered 
           </NavLink>
 
-          <NavLink
-            to="/"
-            onClick={() => setOpen(false)}
-            className={({ isActive }) =>
-              `${navItem} ${isActive ? active : inactive}`
-            }
-          >
-            <Home size={18} />
-            Home
-          </NavLink>
+           
 
         </nav>
 

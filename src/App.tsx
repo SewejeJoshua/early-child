@@ -17,6 +17,8 @@ import BMessage from "@/components/admin/BroadcastedMessage";
 import ChildrensDayRegistrationForm from "@/components/ChildrensDayRegistrationForm";
 import Childadminlogin from "@/components/childrenday/Childadminlogin";
 import Childadmindash from "./components/childrenday/Childadmindash";
+import Childdashhome from "@/components/childrenday/Childdashhome";
+import Registered from "@/components/childrenday/Registered";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -50,8 +52,11 @@ const App = () => (
           </Route>
 
             {/* Childernday */}
-            <Route path="/childrenday/Childadminlogin" element={<Childadminlogin />}>
-              <Route index element={<Childadmindash />} />
+            <Route path="/childrenday/Childadmindash" element={<Childadmindash />}>
+            <Route index element={<Childdashhome />} />
+            <Route path="dashboardhome" element={<Childdashhome />} /> 
+            <Route path="registered" element={<Registered />} />
+             
             
           </Route>
              

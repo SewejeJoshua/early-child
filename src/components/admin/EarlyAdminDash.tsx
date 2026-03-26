@@ -125,7 +125,7 @@ const EarlyAdminDash = () => {
             }
           >
             <Megaphone size={18} />
-            Broadcasts
+            Broadcast
           </NavLink>
 
           <NavLink

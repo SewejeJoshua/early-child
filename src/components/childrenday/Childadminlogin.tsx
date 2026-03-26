@@ -32,17 +32,30 @@ const Childadminlogin = () => {
         throw new Error(data.message || "Login failed");
       }
 
-      // ✅ Save token for future requests
+      // ✅ Save token
       if (data.token) {
         localStorage.setItem("token", data.token);
       }
 
-      // Optional: save user info
+      // ✅ Save user info + role
       if (data.user) {
         localStorage.setItem("adminUser", JSON.stringify(data.user));
+
+        // 🔥 IMPORTANT: distinguish this login
+        if (data.user.role) {
+          localStorage.setItem("role", data.user.role);
+        } else {
+          // fallback if backend doesn't send role
+          localStorage.setItem("role", "child_admin");
+        }
+      } else {
+        // fallback safety
+        localStorage.setItem("role", "child_admin");
       }
 
-      navigate("/childrenday/EarlyAdminDash");
+      // ✅ Redirect correctly
+      navigate("/childrenday/Childadmindash");
+
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -54,7 +67,7 @@ const Childadminlogin = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8">
         <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
-          Admin Login
+          Child Admin Login
         </h2>
 
         {error && (

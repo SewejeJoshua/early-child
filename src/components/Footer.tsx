@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
+import { HashLink } from "react-router-hash-link";
 import { ArrowUpRight, X, Loader2, Calendar } from "lucide-react";
 import Earlylogo from "@/assets/images/early-logo.jpeg";
 
 const footerLinks = [
-  { label: "About", href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Testimonials", href: "#testimonials" },
-  { label: "Contact", href: "#contact" },
+  { label: "About", href: "/#about" },
+  { label: "Services", href: "/#services" },
+  { label: "Testimonials", href: "/#testimonials" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 const socialLinks = [
@@ -75,12 +76,12 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.map((link) => (
                 <li key={link.href}>
-                  <a
-                    href={link.href}
+                  <HashLink
+                    to={link.href}
                     className="font-body text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm"
                   >
                     {link.label}
-                  </a>
+                  </HashLink>
                 </li>
               ))}
             </ul>

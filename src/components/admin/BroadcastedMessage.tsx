@@ -6,6 +6,11 @@ const BMessage = () => {
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
 
+  // ✅ NEW STATES
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState("");
+  const [editedContent, setEditedContent] = useState("");
+
   const fetchMessages = async () => {
     setLoading(true);
     try {
@@ -29,7 +34,53 @@ const BMessage = () => {
     } catch (error) {
       console.error("Failed to fetch messages:", error);
     } finally {
-      setLoading(false); 
+      setLoading(false);
+    }
+  };
+
+  // ✅ EDIT API FUNCTION
+  const handleEdit = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        `${import.meta.env.VITE_ECHILDHOOD_API}/api/news/${selectedItem.id}/ind/`,
+        {
+          method: "PUT", // or PATCH depending on your backend
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: editedTitle,
+            content: editedContent,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        // ✅ Update UI instantly
+        const updatedMessages = messages.map((msg) =>
+          msg.id === selectedItem.id
+            ? { ...msg, title: editedTitle, content: editedContent }
+            : msg
+        );
+
+        setMessages(updatedMessages);
+
+        // update selected item too
+        setSelectedItem({
+          ...selectedItem,
+          title: editedTitle,
+          content: editedContent,
+        });
+
+        setIsEditing(false);
+      } else {
+        console.error("Failed to update message");
+      }
+    } catch (error) {
+      console.error("Edit error:", error);
     }
   };
 
@@ -51,10 +102,14 @@ const BMessage = () => {
           {messages.map((item: any) => (
             <div
               key={item.id}
-              onClick={() => setSelectedItem(item)}
+              onClick={() => {
+                setSelectedItem(item);
+                setEditedTitle(item.title);
+                setEditedContent(item.content);
+                setIsEditing(false);
+              }}
               className="group bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col"
             >
-              {/* ✅ IMAGE SECTION (EXACT LIKE FOOTER) */}
               <div className="relative h-44 w-full overflow-hidden bg-gray-200">
                 {item.image_url && (
                   <>
@@ -72,9 +127,7 @@ const BMessage = () => {
                 )}
               </div>
 
-              {/* CONTENT */}
               <div className="p-5 flex flex-col flex-grow">
-                {/* DATE */}
                 <div className="flex items-center gap-2 text-green-600 mb-3">
                   <Calendar size={14} />
                   <span className="text-[10px] font-bold uppercase tracking-widest">
@@ -84,12 +137,10 @@ const BMessage = () => {
                   </span>
                 </div>
 
-                {/* TITLE */}
                 <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
                   {item.title}
                 </h3>
 
-                {/* CONTENT PREVIEW */}
                 <p className="text-sm text-gray-500 line-clamp-3">
                   {item.content}
                 </p>
@@ -101,7 +152,7 @@ const BMessage = () => {
         <p className="text-gray-400 italic">No messages found.</p>
       )}
 
-      {/* ✅ MODAL (LIKE FOOTER DETAIL VIEW) */}
+      {/* ✅ MODAL */}
       {selectedItem && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 max-w-2xl w-full relative max-h-[90vh] overflow-y-auto">
@@ -127,15 +178,58 @@ const BMessage = () => {
               )}
             </div>
 
-            {/* TITLE */}
-            <h2 className="text-2xl font-bold mb-3 text-center">
-              {selectedItem.title}
-            </h2>
+            {/* ✅ EDITABLE TITLE */}
+            {isEditing ? (
+              <input
+                value={editedTitle}
+                onChange={(e) => setEditedTitle(e.target.value)}
+                className="w-full border p-2 rounded mb-3"
+              />
+            ) : (
+              <h2 className="text-2xl font-bold mb-3 text-center">
+                {selectedItem.title}
+              </h2>
+            )}
 
-            {/* CONTENT */}
-            <p className="text-gray-700 whitespace-pre-line text-justify">
-              {selectedItem.content}
-            </p>
+            {/* ✅ EDITABLE CONTENT */}
+            {isEditing ? (
+              <textarea
+                value={editedContent}
+                onChange={(e) => setEditedContent(e.target.value)}
+                className="w-full border p-3 rounded min-h-[120px]"
+              />
+            ) : (
+              <p className="text-gray-700 whitespace-pre-line text-justify">
+                {selectedItem.content}
+              </p>
+            )}
+
+            {/* ✅ ACTION BUTTONS */}
+            <div className="mt-6 flex justify-end gap-3">
+              {isEditing ? (
+                <>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="px-4 py-2 bg-gray-200 rounded"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleEdit}
+                    className="px-4 py-2 bg-green-600 text-white rounded"
+                  >
+                    Send
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded"
+                >
+                  Edit
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}

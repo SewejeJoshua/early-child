@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+// Images
+
 import Img1 from "@/assets/images/gal1.jpeg";
 import Img2 from "@/assets/images/gal2.jpeg";
 import Img3 from "@/assets/images/gal3.jpeg";
@@ -15,6 +17,8 @@ import Img8 from "@/assets/images/gal8.jpeg";
 import Img9 from "@/assets/images/gal9.jpeg";
 import Img10 from "@/assets/images/gal10.jpeg";
 import Img11 from "@/assets/images/gal11.jpeg";
+
+// Videos
 
 import Vid1 from "@/assets/videos/galvid1.mp4";
 import Vid2 from "@/assets/videos/galvid2.mp4";

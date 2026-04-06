@@ -46,7 +46,7 @@ const BMessage = () => {
       const response = await fetch(
         `${import.meta.env.VITE_ECHILDHOOD_API}/api/news/${selectedItem.id}/ind/`,
         {
-          method: "PUT", // or PATCH depending on your backend
+          method: "PUT",
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
@@ -59,7 +59,6 @@ const BMessage = () => {
       );
 
       if (response.ok) {
-        // ✅ Update UI instantly
         const updatedMessages = messages.map((msg) =>
           msg.id === selectedItem.id
             ? { ...msg, title: editedTitle, content: editedContent }
@@ -68,7 +67,6 @@ const BMessage = () => {
 
         setMessages(updatedMessages);
 
-        // update selected item too
         setSelectedItem({
           ...selectedItem,
           title: editedTitle,
@@ -81,6 +79,39 @@ const BMessage = () => {
       }
     } catch (error) {
       console.error("Edit error:", error);
+    }
+  };
+
+  // ✅ DELETE FUNCTION (ADDED)
+  const handleDelete = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        `${import.meta.env.VITE_ECHILDHOOD_API}/api/news/${selectedItem.id}/ind/`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        // remove from UI
+        setMessages((prev) =>
+          prev.filter((msg) => msg.id !== selectedItem.id)
+        );
+
+        // close modal
+        setSelectedItem(null);
+      } else {
+        const err = await response.text();
+        console.error("Delete failed:", err);
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
     }
   };
 
@@ -178,7 +209,7 @@ const BMessage = () => {
               )}
             </div>
 
-            {/* ✅ EDITABLE TITLE */}
+            {/* TITLE */}
             {isEditing ? (
               <input
                 value={editedTitle}
@@ -191,7 +222,7 @@ const BMessage = () => {
               </h2>
             )}
 
-            {/* ✅ EDITABLE CONTENT */}
+            {/* CONTENT */}
             {isEditing ? (
               <textarea
                 value={editedContent}
@@ -204,7 +235,7 @@ const BMessage = () => {
               </p>
             )}
 
-            {/* ✅ ACTION BUTTONS */}
+            {/* ACTION BUTTONS */}
             <div className="mt-6 flex justify-end gap-3">
               {isEditing ? (
                 <>
@@ -222,12 +253,22 @@ const BMessage = () => {
                   </button>
                 </>
               ) : (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded"
-                >
-                  Edit
-                </button>
+                <>
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded"
+                  >
+                    Edit
+                  </button>
+
+                  {/* ✅ DELETE BUTTON ADDED */}
+                  <button
+                    onClick={handleDelete}
+                    className="px-4 py-2 bg-red-600 text-white rounded"
+                  >
+                    Delete
+                  </button>
+                </>
               )}
             </div>
           </div>

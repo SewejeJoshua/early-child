@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Trash2, X } from "lucide-react";
+import { Trash2, X, Loader2 } from "lucide-react";
 
 const API = import.meta.env.VITE_ECHILDHOOD_API;
 
@@ -28,9 +28,14 @@ const Registered = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const token = localStorage.getItem("token");
+
+  const authHeader = token
+    ? { Authorization: `Token ${token}` } // change to Bearer if needed
+    : {};
 
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -47,11 +52,15 @@ const Registered = () => {
       const res = await fetch(`${API}/api/registrations/`, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
+          ...authHeader,
         },
       });
+
+      if (!res.ok) throw new Error("Failed to fetch users");
+
       const data = await res.json();
       const list = Array.isArray(data) ? data : data.results || [];
+
       setUsers(list);
       setFilteredUsers(list);
     } catch (err) {
@@ -69,9 +78,12 @@ const Registered = () => {
       const res = await fetch(`${API}/api/Deleted-registrations/`, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
+          ...authHeader,
         },
       });
+
+      if (!res.ok) throw new Error("Failed to fetch deleted users");
+
       const data = await res.json();
       setDeletedUsers(Array.isArray(data) ? data : data.results || []);
     } catch (err) {
@@ -101,24 +113,37 @@ const Registered = () => {
   const paginatedUsers = filteredUsers.slice(start, start + ITEMS_PER_PAGE);
   const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
 
-  // DELETE USER + AUTO REFRESH
+  // DELETE USER
   const handleDelete = async (id: number) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this user?"
+    );
+    if (!confirmDelete) return;
+
     try {
+      setDeletingId(id);
+
       const res = await fetch(`${API}/api/registrations/${id}/delete/`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
+          ...authHeader,
         },
       });
 
-      if (res.ok) {
-        // REFRESH BOTH TABLES IMMEDIATELY
-        await fetchUsers();
-        await fetchDeletedUsers();
-      }
+      if (!res.ok) throw new Error("Delete failed");
+
+      // ⚡ Instant UI update
+      setUsers((prev) => prev.filter((u) => u.id !== id));
+      setFilteredUsers((prev) => prev.filter((u) => u.id !== id));
+
+      // 🔄 Background refresh
+      fetchDeletedUsers();
     } catch (err) {
       console.error(err);
+      alert("Failed to delete user");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -126,7 +151,7 @@ const Registered = () => {
     const { date, time } = formatDateTime(user.created_at);
 
     return (
-      <tr key={user.id} className="text-center">
+      <tr key={user.id} className="text-center hover:bg-gray-50">
         <td className="p-2 border">
           {user.first_name} {user.last_name}
         </td>
@@ -147,18 +172,24 @@ const Registered = () => {
               src={user.receipt_url}
               alt="receipt"
               onClick={() => setPreviewImage(user.receipt_url)}
+              onError={(e: any) => (e.target.style.display = "none")}
               className="w-16 h-16 object-cover mx-auto rounded cursor-pointer"
             />
           </td>
         )}
 
-        <td className="p-2 border flex justify-center">
+        <td className="p-2 border">
           {!isDeleted && (
             <button
               onClick={() => handleDelete(user.id)}
-              className="p-2 bg-red-500 text-white rounded"
+              disabled={deletingId === user.id}
+              className="p-2 bg-red-500 text-white rounded flex items-center justify-center mx-auto disabled:opacity-50"
             >
-              <Trash2 size={16} />
+              {deletingId === user.id ? (
+                <Loader2 className="animate-spin" size={16} />
+              ) : (
+                <Trash2 size={16} />
+              )}
             </button>
           )}
         </td>
@@ -181,7 +212,9 @@ const Registered = () => {
 
       {/* USERS TABLE */}
       {loading ? (
-        <p>Loading...</p>
+        <div className="flex justify-center py-10">
+          <Loader2 className="animate-spin" />
+        </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full border text-sm">
@@ -219,23 +252,23 @@ const Registered = () => {
       )}
 
       {/* PAGINATION */}
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-between mt-4 items-center">
         <button
           disabled={page === 1}
           onClick={() => setPage((p) => p - 1)}
-          className="px-3 py-1 bg-gray-200 rounded"
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
         >
           Prev
         </button>
 
-        <span>
-          Page {page} of {totalPages}
+        <span className="text-sm">
+          Page {page} of {totalPages || 1}
         </span>
 
         <button
-          disabled={page === totalPages}
+          disabled={page === totalPages || totalPages === 0}
           onClick={() => setPage((p) => p + 1)}
-          className="px-3 py-1 bg-gray-200 rounded"
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
         >
           Next
         </button>
@@ -258,14 +291,14 @@ const Registered = () => {
               <th className="p-2 border">School</th>
               <th className="p-2 border">Pass Code</th>
               <th className="p-2 border">Date</th>
-              <th className="p-2 border">Time</th> 
+              <th className="p-2 border">Time</th>
             </tr>
           </thead>
 
           <tbody>
             {deletedUsers.length === 0 ? (
               <tr>
-                <td colSpan={12} className="p-4 text-center">
+                <td colSpan={10} className="p-4 text-center">
                   No deleted users
                 </td>
               </tr>
@@ -278,7 +311,7 @@ const Registered = () => {
 
       {/* IMAGE MODAL */}
       {previewImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="relative">
             <img
               src={previewImage}

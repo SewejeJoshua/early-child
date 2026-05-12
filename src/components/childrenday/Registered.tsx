@@ -9,11 +9,16 @@ interface User {
   last_name: string;
   age: string;
   gender: string;
+  school: string;
+
+  football: string;
+  football_club: string;
+
   parent_name: string;
   parent_phone: string;
   medical_notes: string;
   email: string;
-  school: string;
+
   receipt_url: string;
   pass_code: string;
   created_at: string;
@@ -25,20 +30,24 @@ const Registered = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [deletedUsers, setDeletedUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const token = localStorage.getItem("token");
 
   const authHeader = token
-    ? { Authorization: `Token ${token}` } // change to Bearer if needed
+    ? { Authorization: `Token ${token}` }
     : {};
 
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
+
     return {
       date: date.toLocaleDateString(),
       time: date.toLocaleTimeString(),
@@ -48,6 +57,7 @@ const Registered = () => {
   // FETCH USERS
   const fetchUsers = async () => {
     setLoading(true);
+
     try {
       const res = await fetch(`${API}/api/registrations/`, {
         headers: {
@@ -59,6 +69,7 @@ const Registered = () => {
       if (!res.ok) throw new Error("Failed to fetch users");
 
       const data = await res.json();
+
       const list = Array.isArray(data) ? data : data.results || [];
 
       setUsers(list);
@@ -85,6 +96,7 @@ const Registered = () => {
       if (!res.ok) throw new Error("Failed to fetch deleted users");
 
       const data = await res.json();
+
       setDeletedUsers(Array.isArray(data) ? data : data.results || []);
     } catch (err) {
       console.error(err);
@@ -100,17 +112,29 @@ const Registered = () => {
   // SEARCH
   useEffect(() => {
     const filtered = users.filter((user) =>
-      `${user.first_name} ${user.last_name} ${user.email} ${user.parent_phone} ${user.pass_code}`
+      `
+      ${user.first_name}
+      ${user.last_name}
+      ${user.email}
+      ${user.parent_phone}
+      ${user.pass_code}
+      ${user.school}
+      ${user.football_club}
+      ${user.football}
+      `
         .toLowerCase()
         .includes(search.toLowerCase())
     );
+
     setFilteredUsers(filtered);
     setPage(1);
   }, [search, users]);
 
   // PAGINATION
   const start = (page - 1) * ITEMS_PER_PAGE;
+
   const paginatedUsers = filteredUsers.slice(start, start + ITEMS_PER_PAGE);
+
   const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
 
   // DELETE USER
@@ -118,26 +142,28 @@ const Registered = () => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this user?"
     );
+
     if (!confirmDelete) return;
 
     try {
       setDeletingId(id);
 
-      const res = await fetch(`${API}/api/registrations/${id}/delete/`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          ...authHeader,
-        },
-      });
+      const res = await fetch(
+        `${API}/api/registrations/${id}/delete/`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            ...authHeader,
+          },
+        }
+      );
 
       if (!res.ok) throw new Error("Delete failed");
 
-      // ⚡ Instant UI update
       setUsers((prev) => prev.filter((u) => u.id !== id));
       setFilteredUsers((prev) => prev.filter((u) => u.id !== id));
 
-      // 🔄 Background refresh
       fetchDeletedUsers();
     } catch (err) {
       console.error(err);
@@ -147,21 +173,44 @@ const Registered = () => {
     }
   };
 
+  // FOOTBALL FIX
+  const formatFootball = (value: any) => {
+    if (!value) return "No";
+    const v = String(value).toLowerCase();
+    if (["yes", "true", "1"].includes(v)) return "Yes";
+    if (["no", "false", "0"].includes(v)) return "No";
+    return value;
+  };
+
+  const formatClub = (user: User) => {
+    if (formatFootball(user.football) !== "Yes") return "No";
+    return user.football_club || "Not provided";
+  };
+
+  // TABLE ROWS
   const renderTableRows = (user: User, isDeleted = false) => {
     const { date, time } = formatDateTime(user.created_at);
 
     return (
       <tr key={user.id} className="text-center hover:bg-gray-50">
-        <td className="p-2 border">
+        <td className="p-2 border whitespace-nowrap">
           {user.first_name} {user.last_name}
         </td>
+
         <td className="p-2 border">{user.age}</td>
-        <td className="p-2 border">{user.gender}</td>
+        <td className="p-2 border capitalize">{user.gender}</td>
+        <td className="p-2 border">{user.school}</td>
+
+        <td className="p-2 border font-medium">
+          {formatFootball(user.football)}
+        </td>
+
+        <td className="p-2 border">{formatClub(user)}</td>
+
         <td className="p-2 border">{user.parent_name}</td>
         <td className="p-2 border">{user.email}</td>
         <td className="p-2 border">{user.parent_phone}</td>
-        <td className="p-2 border">{user.medical_notes}</td>
-        <td className="p-2 border">{user.school}</td>
+        <td className="p-2 border">{user.medical_notes || "-"}</td>
         <td className="p-2 border font-mono">{user.pass_code}</td>
         <td className="p-2 border">{date}</td>
         <td className="p-2 border">{time}</td>
@@ -170,9 +219,7 @@ const Registered = () => {
           <td className="p-2 border">
             <img
               src={user.receipt_url}
-              alt="receipt"
               onClick={() => setPreviewImage(user.receipt_url)}
-              onError={(e: any) => (e.target.style.display = "none")}
               className="w-16 h-16 object-cover mx-auto rounded cursor-pointer"
             />
           </td>
@@ -183,7 +230,7 @@ const Registered = () => {
             <button
               onClick={() => handleDelete(user.id)}
               disabled={deletingId === user.id}
-              className="p-2 bg-red-500 text-white rounded flex items-center justify-center mx-auto disabled:opacity-50"
+              className="p-2 bg-red-500 text-white rounded"
             >
               {deletingId === user.id ? (
                 <Loader2 className="animate-spin" size={16} />
@@ -201,126 +248,99 @@ const Registered = () => {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
 
-      {/* SEARCH */}
       <input
-        type="text"
-        placeholder="Search name, email, or pass code..."
-        className="border p-2 mb-4 w-full rounded"
+        className="border p-3 w-full mb-4 rounded"
+        placeholder="Search users..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
 
       {/* USERS TABLE */}
       {loading ? (
-        <div className="flex justify-center py-10">
-          <Loader2 className="animate-spin" />
-        </div>
+        <Loader2 className="animate-spin mx-auto" />
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full border text-sm">
+        <div className="overflow-x-auto border rounded">
+          <table className="min-w-full text-sm">
             <thead className="bg-gray-100">
               <tr>
-                <th className="p-2 border">Name</th>
-                <th className="p-2 border">Age</th>
-                <th className="p-2 border">Gender</th>
-                <th className="p-2 border">Parent Name</th>
-                <th className="p-2 border">Email</th>
-                <th className="p-2 border">Parent Phone</th>
-                <th className="p-2 border">Medical Notes</th>
-                <th className="p-2 border">School</th>
-                <th className="p-2 border">Pass Code</th>
-                <th className="p-2 border">Date</th>
-                <th className="p-2 border">Time</th>
-                <th className="p-2 border">Receipt</th>
-                <th className="p-2 border">Actions</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>School</th>
+                <th>Football</th>
+                <th>Club</th>
+                <th>Parent</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Notes</th>
+                <th>Code</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Receipt</th>
+                <th>Action</th>
               </tr>
             </thead>
 
             <tbody>
-              {paginatedUsers.length === 0 ? (
-                <tr>
-                  <td colSpan={13} className="p-4 text-center">
-                    No users found
-                  </td>
-                </tr>
-              ) : (
-                paginatedUsers.map((user) => renderTableRows(user))
-              )}
+              {paginatedUsers.map((u) => renderTableRows(u))}
             </tbody>
           </table>
         </div>
       )}
 
       {/* PAGINATION */}
-      <div className="flex justify-between mt-4 items-center">
-        <button
-          disabled={page === 1}
-          onClick={() => setPage((p) => p - 1)}
-          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-        >
+      <div className="flex justify-between mt-4">
+        <button disabled={page === 1} onClick={() => setPage(page - 1)}>
           Prev
         </button>
 
-        <span className="text-sm">
+        <span>
           Page {page} of {totalPages || 1}
         </span>
 
         <button
-          disabled={page === totalPages || totalPages === 0}
-          onClick={() => setPage((p) => p + 1)}
-          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          disabled={page === totalPages}
+          onClick={() => setPage(page + 1)}
         >
           Next
         </button>
       </div>
 
-      {/* DELETED USERS */}
+      {/* DELETED USERS TABLE */}
       <h2 className="text-xl font-bold mt-10 mb-4">Deleted Users</h2>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full border text-sm">
+      <div className="overflow-x-auto border rounded">
+        <table className="min-w-full text-sm">
           <thead className="bg-red-100">
             <tr>
-              <th className="p-2 border">Name</th>
-              <th className="p-2 border">Age</th>
-              <th className="p-2 border">Gender</th>
-              <th className="p-2 border">Parent Name</th>
-              <th className="p-2 border">Email</th>
-              <th className="p-2 border">Parent Phone</th>
-              <th className="p-2 border">Medical Notes</th>
-              <th className="p-2 border">School</th>
-              <th className="p-2 border">Pass Code</th>
-              <th className="p-2 border">Date</th>
-              <th className="p-2 border">Time</th>
+              <th>Name</th>
+              <th>Age</th>
+              <th>Gender</th>
+              <th>School</th>
+              <th>Football</th>
+              <th>Club</th>
+              <th>Parent</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Notes</th>
+              <th>Code</th>
+              <th>Date</th>
+              <th>Time</th>
             </tr>
           </thead>
 
           <tbody>
-            {deletedUsers.length === 0 ? (
-              <tr>
-                <td colSpan={10} className="p-4 text-center">
-                  No deleted users
-                </td>
-              </tr>
-            ) : (
-              deletedUsers.map((user) => renderTableRows(user, true))
-            )}
+            {deletedUsers.map((u) => renderTableRows(u, true))}
           </tbody>
         </table>
       </div>
 
       {/* IMAGE MODAL */}
       {previewImage && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center">
           <div className="relative">
-            <img
-              src={previewImage}
-              className="max-w-[90vw] max-h-[90vh] rounded"
-            />
-            <button
-              onClick={() => setPreviewImage(null)}
-              className="absolute top-2 right-2 bg-white p-1 rounded"
-            >
+            <img src={previewImage} className="max-w-[90vw]" />
+            <button onClick={() => setPreviewImage(null)}>
               <X />
             </button>
           </div>

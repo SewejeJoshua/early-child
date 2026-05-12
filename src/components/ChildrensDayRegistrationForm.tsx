@@ -9,8 +9,10 @@ const ChildrensDayRegistrationForm = () => {
     age: "",
     gender: "",
     school: "",
+    football: "",
+    football_club: "",
     parent_name: "",
-    email: "", 
+    email: "",
     parent_phone: "",
     medical_notes: "",
     receipt: null as File | null,
@@ -21,10 +23,34 @@ const ChildrensDayRegistrationForm = () => {
   const [token, setToken] = useState("");
   const [fname, setFname] = useState("");
   const [copied, setCopied] = useState(false);
-  const [accountCopied, setAccountCopied] = useState(false); // ✅ separate state
+  const [accountCopied, setAccountCopied] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+
+    // Reset club if child selects "No"
+    if (name === "football" && value === "no") {
+      setFormData({
+        ...formData,
+        football: value,
+        football_club: "No",
+      });
+      return;
+    }
+
+    // Clear club field when selecting "Yes"
+    if (name === "football" && value === "yes") {
+      setFormData({
+        ...formData,
+        football: value,
+        football_club: "",
+      });
+      return;
+    }
+
+    setFormData({ ...formData, [name]: value });
   };
 
   const accountNumber = "0058577041";
@@ -41,26 +67,49 @@ const ChildrensDayRegistrationForm = () => {
 
     try {
       const dataToSend = new FormData();
+
       dataToSend.append("first_name", formData.first_name);
       dataToSend.append("last_name", formData.last_name);
       dataToSend.append("age", formData.age);
       dataToSend.append("gender", formData.gender);
       dataToSend.append("school", formData.school);
+
+      // ✅ Football fields
+      dataToSend.append(
+        "football",
+        formData.football
+      );
+
+      dataToSend.append(
+        "football_club",
+        formData.football === "yes"
+          ? formData.football_club
+          : "No"
+      );
+
       dataToSend.append("parent_name", formData.parent_name);
       dataToSend.append("email", formData.email);
-      dataToSend.append("parent_phone", "+234" + formData.parent_phone);
-      dataToSend.append("medical_notes", formData.medical_notes || "");
+      dataToSend.append(
+        "parent_phone",
+        "+234" + formData.parent_phone
+      );
+      dataToSend.append(
+        "medical_notes",
+        formData.medical_notes || ""
+      );
 
       if (formData.receipt) {
         dataToSend.append("receipt", formData.receipt);
       }
-      
 
-      const response = await fetch(`${import.meta.env.VITE_ECHILDHOOD_API}/api/register/`, {
-        method: "POST",
-        body: dataToSend,
-        headers: { Accept: "application/json" },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_ECHILDHOOD_API}/api/register/`,
+        {
+          method: "POST",
+          body: dataToSend,
+          headers: { Accept: "application/json" },
+        }
+      );
 
       const data = await response.json();
 
@@ -86,7 +135,6 @@ const ChildrensDayRegistrationForm = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // ✅ new handler for account number
   const handleAccountCopy = () => {
     navigator.clipboard.writeText(accountNumber);
     setAccountCopied(true);
@@ -98,17 +146,36 @@ const ChildrensDayRegistrationForm = () => {
       {!submitted ? (
         <div className="w-full max-w-xl bg-white rounded-3xl shadow-xl overflow-hidden">
           <div className="relative h-70 w-full">
-            <img src={Chiday} alt="Childrens Day" className="w-full h-45" />
+            <img
+              src={Chiday}
+              alt="Childrens Day"
+              className="w-full h-45"
+            />
           </div>
 
           <div className="p-6 md:p-8 space-y-6">
             <div className="bg-green-50 border-l-4 border-green-500 p-6 rounded-r-lg">
               <p className="text-gray-700 text-sm leading-relaxed text-justify">
-                🎉 <span className="font-bold text-green-700  decoration-green-200">EarlyChildhood Children’s Day 2026 Party!</span> 🎉
-                <br /><br />
-                Get ready for a day filled with laughter, joy, and unforgettable memories! EarlyChildhood warmly invites you and your little ones to our exciting Children’s Day 2026 Party — a celebration specially designed to bring smiles, fun activities, and a truly uplifting and spirit-filled experience for every child.
-                <br /><br />
-                Beyond the fun, this is a moment to nurture hearts and celebrate the gift of every child. We commit this day into God’s hands, trusting Him for safety, joy, and a beautiful atmosphere where every child feels loved, uplifted, and truly special. 🌟
+                🎉{" "}
+                <span className="font-bold text-green-700 decoration-green-200">
+                  EarlyChildhood Children’s Day 2026 Party!
+                </span>{" "}
+                🎉
+                <br />
+                <br />
+                Get ready for a day filled with laughter, joy, and
+                unforgettable memories! EarlyChildhood warmly invites
+                you and your little ones to our exciting Children’s Day
+                2026 Party — a celebration specially designed to bring
+                smiles, fun activities, and a truly uplifting and
+                spirit-filled experience for every child.
+                <br />
+                <br />
+                Beyond the fun, this is a moment to nurture hearts and
+                celebrate the gift of every child. We commit this day
+                into God’s hands, trusting Him for safety, joy, and a
+                beautiful atmosphere where every child feels loved,
+                uplifted, and truly special. 🌟
               </p>
             </div>
 
@@ -118,14 +185,17 @@ const ChildrensDayRegistrationForm = () => {
                 <h3>Payment Details</h3>
               </div>
 
-              {/* ✅ FIXED GRID ALIGNMENT */}
               <div className="grid grid-cols-2 gap-y-3 text-sm text-gray-600 items-center">
                 <span className="font-medium">Fee:</span>
-                <span className="text-gray-900 font-bold">₦5,000</span>
+                <span className="text-gray-900 font-bold">
+                  ₦5,000
+                </span>
 
-                <span className="font-medium">Account Number:</span>
+                <span className="font-medium">
+                  Account Number:
+                </span>
 
-                <div 
+                <div
                   className="group flex items-center gap-1.5 cursor-pointer rounded-md px-2 py-1 hover:bg-gray-100 transition-colors w-max"
                   onClick={handleAccountCopy}
                   title="Click to copy account number"
@@ -134,9 +204,9 @@ const ChildrensDayRegistrationForm = () => {
                     {accountNumber}
                   </span>
 
-                  {accountCopied ? ( 
+                  {accountCopied ? (
                     <Check className="w-4 h-4 text-green-600 shrink-0" />
-                  ) : (  
+                  ) : (
                     <Copy className="w-4 h-4 text-gray-400 group-hover:text-blue-600 opacity-70 group-hover:opacity-100 transition-all shrink-0" />
                   )}
                 </div>
@@ -147,37 +217,130 @@ const ChildrensDayRegistrationForm = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b pb-1">Child's Information</h4>
+              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b pb-1">
+                Child's Information
+              </h4>
+
               <div className="grid grid-cols-2 gap-4">
-                <input type="text" name="first_name" placeholder="First Name" value={formData.first_name} onChange={handleChange} required className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm" />
-                <input type="text" name="last_name" placeholder="Last Name" value={formData.last_name} onChange={handleChange} required className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm" />
+                <input
+                  type="text"
+                  name="first_name"
+                  placeholder="First Name"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  required
+                  className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                />
+
+                <input
+                  type="text"
+                  name="last_name"
+                  placeholder="Last Name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  required
+                  className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <select name="age" value={formData.age} onChange={handleChange} required className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm text-gray-500">
+                <select
+                  name="age"
+                  value={formData.age}
+                  onChange={handleChange}
+                  required
+                  className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm text-gray-500"
+                >
                   <option value="">Select Age</option>
                   <option value="1-5">1-5 years</option>
                   <option value="6-10">6-10 years</option>
                   <option value="11-13">11-13 years</option>
                   <option value="14-18">14-18 years</option>
                 </select>
-                <select name="gender" value={formData.gender} onChange={handleChange} required className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm text-gray-500">
+
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                  required
+                  className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm text-gray-500"
+                >
                   <option value="">Gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                 </select>
               </div>
 
-              <input type="text" name="school" placeholder="Name of School" value={formData.school} onChange={handleChange} required className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm" />
-              <input type="text" name="medical_notes" placeholder="Medical Notes (Allergies, etc.)" value={formData.medical_notes} onChange={handleChange} className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm" />
-              
-              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b pb-1 pt-2">Parent / Guardian Details</h4>
-              
-              <input type="text" name="parent_name" placeholder="Full Name" value={formData.parent_name} onChange={handleChange} required className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm" />
+              <input
+                type="text"
+                name="school"
+                placeholder="Name of School"
+                value={formData.school}
+                onChange={handleChange}
+                required
+                className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm"
+              />
+
+              {/* ✅ Football Question */}
+              <div className="space-y-4">
+                <select
+                  name="football"
+                  value={formData.football}
+                  onChange={handleChange}
+                  required
+                  className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm text-gray-500"
+                >
+                  <option value="">
+                    Does the child want to play football?
+                  </option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+
+                {/* ✅ Club Dropdown/Input */}
+                {formData.football === "yes" && (
+                  <input
+                    type="text"
+                    name="football_club"
+                    placeholder="Which club does the child represent? e.g Barcelona"
+                    value={formData.football_club}
+                    onChange={handleChange}
+                    required
+                    className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  />
+                )}
+              </div>
+
+              <input
+                type="text"
+                name="medical_notes"
+                placeholder="Medical Notes (Allergies, etc.)"
+                value={formData.medical_notes}
+                onChange={handleChange}
+                className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm"
+              />
+
+              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b pb-1 pt-2">
+                Parent / Guardian Details
+              </h4>
+
+              <input
+                type="text"
+                name="parent_name"
+                placeholder="Full Name"
+                value={formData.parent_name}
+                onChange={handleChange}
+                required
+                className="w-full border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 text-sm"
+              />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                  <Mail
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    size={16}
+                  />
+
                   <input
                     type="email"
                     name="email"
@@ -190,7 +353,10 @@ const ChildrensDayRegistrationForm = () => {
                 </div>
 
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500 font-semibold text-xs">+234</div>
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500 font-semibold text-xs">
+                    +234
+                  </div>
+
                   <input
                     type="tel"
                     name="parent_phone"
@@ -199,7 +365,10 @@ const ChildrensDayRegistrationForm = () => {
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        parent_phone: e.target.value.replace(/\D/g, ""),
+                        parent_phone: e.target.value.replace(
+                          /\D/g,
+                          ""
+                        ),
                       })
                     }
                     required
@@ -211,16 +380,34 @@ const ChildrensDayRegistrationForm = () => {
               <div className="pt-2">
                 <label className="flex items-center justify-between w-full border-2 border-dashed border-gray-300 rounded-xl px-4 py-3 bg-gray-50 cursor-pointer hover:bg-gray-100 transition">
                   <div className="flex items-center gap-3">
-                    <Upload size={18} className="text-green-600" />
+                    <Upload
+                      size={18}
+                      className="text-green-600"
+                    />
+
                     <span className="text-sm text-gray-500 font-medium">
-                      {formData.receipt ? formData.receipt.name : "Upload Receipt"}
+                      {formData.receipt
+                        ? formData.receipt.name
+                        : "Upload Receipt"}
                     </span>
                   </div>
-                  <input type="file" name="receipt" accept="image/*,.pdf" onChange={handleFileChange} required className="hidden" />
+
+                  <input
+                    type="file"
+                    name="receipt"
+                    accept="image/*,.pdf"
+                    onChange={handleFileChange}
+                    required
+                    className="hidden"
+                  />
                 </label>
               </div>
 
-              <button type="submit" disabled={loading} className="w-full bg-green-600 text-white py-3 rounded-xl font-bold shadow-md shadow-green-200 hover:bg-green-700 active:scale-95 transition-all disabled:opacity-50">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-green-600 text-white py-3 rounded-xl font-bold shadow-md shadow-green-200 hover:bg-green-700 active:scale-95 transition-all disabled:opacity-50"
+              >
                 {loading ? "Processing..." : "Register Now"}
               </button>
             </form>
@@ -231,21 +418,45 @@ const ChildrensDayRegistrationForm = () => {
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
             <Check size={40} className="text-green-600" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">Yay {fname}! 
+
+          <h2 className="text-2xl font-bold text-gray-900">
+            Yay {fname}!
           </h2>
-          <p className="text-gray-500 text-sm"> You’re all set for the EarlyChildhood Children’s Day 2026 Party!
-            Your special token code is super important — it’s your own VIP key to all the fun, games, and surprises! Keep it safe because if you lose it, you won’t be able to join the fun or enjoy all the goodies, so copy it and keep it somewhere safe until the big day!
 
-        Can’t wait to see you have a super fun day! 🎈💛 
-
+          <p className="text-gray-500 text-sm">
+            You’re all set for the EarlyChildhood Children’s Day
+            2026 Party! Your special token code is super important —
+            it’s your own VIP key to all the fun, games, and
+            surprises! Keep it safe because if you lose it, you
+            won’t be able to join the fun or enjoy all the goodies,
+            so copy it and keep it somewhere safe until the big day!
+            <br />
+            <br />
+            Can’t wait to see you have a super fun day! 🎈💛
           </p>
-          
+
           <div className="bg-gray-50 rounded-2xl p-4 space-y-2 border border-gray-100">
-            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Your Token Code:</span>
+            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+              Your Token Code:
+            </span>
+
             <div className="flex items-center gap-2">
-              <input type="text" value={token} readOnly className="flex-1 px-3 py-2 text-center text-lg font-mono font-bold text-green-700 bg-transparent outline-none" />
-              <button onClick={handleCopy} className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                {copied ? <Check size={18} /> : <Copy size={18} />}
+              <input
+                type="text"
+                value={token}
+                readOnly
+                className="flex-1 px-3 py-2 text-center text-lg font-mono font-bold text-green-700 bg-transparent outline-none"
+              />
+
+              <button
+                onClick={handleCopy}
+                className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              >
+                {copied ? (
+                  <Check size={18} />
+                ) : (
+                  <Copy size={18} />
+                )}
               </button>
             </div>
           </div>

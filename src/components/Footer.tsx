@@ -22,18 +22,21 @@ const Footer = () => {
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
 
-  // Fetch news
   const fetchNews = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${import.meta.env.VITE_ECHILDHOOD_API}/api/news-list/`, {
-        method: "GET",
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_ECHILDHOOD_API}/api/news-list/`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       if (response.ok) {
         const data = await response.json();
         setNews(Array.isArray(data) ? data : data.results || []);
@@ -51,28 +54,39 @@ const Footer = () => {
 
   return (
     <footer className="bg-foreground py-16">
+
       <div className="container mx-auto px-4 max-w-6xl">
+
         <div className="grid md:grid-cols-5 gap-12 mb-14">
-          {/* Brand */}
+
+          {/* BRAND / SEO IDENTITY */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2.5 mb-5">
-              <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-display font-800 text-sm"><img src={Earlylogo} alt="Early Childhood Logo" className="rounded-lg"/></span>
-              </div>
+            <div className="flex items-center gap-3 mb-5">
+
+              <img
+                src={Earlylogo}
+                alt="Early Childhood Development Ltd Logo"
+                className="w-9 h-9 rounded-lg object-cover"
+              />
+
               <span className="font-display text-lg font-700 text-primary-foreground">
-                Early Childhood
+                Early Childhood Development Ltd
               </span>
+
             </div>
+
             <p className="font-body text-primary-foreground/50 text-sm leading-relaxed max-w-sm">
-              Nurturing young minds through evidence-based, play-based learning and compassionate care since 2010.
+              A trusted early childhood education and preschool center in Ibadan, Nigeria,
+              focused on play-based learning and holistic child development.
             </p>
           </div>
 
-          {/* Navigation */}
-          <div>
+          {/* NAVIGATION */}
+          <nav aria-label="Footer navigation">
             <h4 className="font-display font-600 text-primary-foreground/40 text-xs uppercase tracking-wider mb-5">
-              Navigation
+              Quick Links
             </h4>
+
             <ul className="space-y-3">
               {footerLinks.map((link) => (
                 <li key={link.href}>
@@ -85,13 +99,14 @@ const Footer = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
-          {/* Social Links */}
+          {/* SOCIAL */}
           <div>
             <h4 className="font-display font-600 text-primary-foreground/40 text-xs uppercase tracking-wider mb-5">
               Connect
             </h4>
+
             <ul className="space-y-3">
               {socialLinks.map((link) => (
                 <li key={link.label}>
@@ -110,28 +125,32 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Updates / Newsletter */}
+          {/* UPDATES */}
           <div>
             <h4 className="font-display font-600 text-primary-foreground/40 text-xs uppercase tracking-wider mb-5">
-              Updates
+              School Updates
             </h4>
+
             <button
               onClick={() => setShowNewsletter(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground font-body font-600 text-sm hover:bg-primary/90 transition-colors w-fit"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground font-body font-600 text-sm hover:bg-primary/90 transition-colors"
             >
-              Recent Information
+              View News
               <ArrowUpRight size={16} />
             </button>
           </div>
+
         </div>
 
-        {/* Bottom Footer */}
+        {/* BOTTOM BAR */}
         <div className="border-t border-primary-foreground/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+
           <p className="font-body text-primary-foreground/30 text-sm">
-            © {new Date().getFullYear()} Early Childhood. All rights reserved.
+            © {new Date().getFullYear()} Early Childhood Development Ltd. All rights reserved.
           </p>
+
           <div className="flex gap-6">
-            {["Privacy", "Terms"].map((item) => (
+            {["Privacy Policy", "Terms of Service"].map((item) => (
               <a
                 key={item}
                 href="#"
@@ -141,116 +160,121 @@ const Footer = () => {
               </a>
             ))}
           </div>
+
         </div>
       </div>
 
-      {/* --- Newsletter Modal --- */}
+      {/* NEWS MODAL */}
       {showNewsletter && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
+
           <div className="relative w-full max-w-5xl bg-[#f8fafc] rounded-3xl p-6 md:p-10 shadow-2xl max-h-[90vh] overflow-y-auto">
+
             <button
               onClick={() => setShowNewsletter(false)}
-              className="absolute top-6 right-6 text-gray-400 hover:text-red-500 transition-colors bg-white shadow-sm rounded-full p-2 z-10"
+              className="absolute top-6 right-6 text-gray-400 hover:text-red-500 bg-white shadow-sm rounded-full p-2"
             >
               <X size={24} />
             </button>
 
-            <div className="mb-10 text-center md:text-left">
-              <h3 className="font-display text-4xl font-900 text-gray-900 tracking-tight">
-                School Broadcasts
-              </h3>
-              <p className="font-body text-gray-500 mt-2">
-                Stay updated with the latest happenings at Early Childhood.
-              </p>
-            </div>
+            <h2 className="font-display text-3xl font-800 mb-2">
+              School Updates & News
+            </h2>
+
+            <p className="text-gray-500 mb-8">
+              Latest announcements from Early Childhood Development Ltd, Ibadan.
+            </p>
 
             {loading ? (
               <div className="flex flex-col items-center py-20">
                 <Loader2 className="animate-spin text-green-600 mb-4" size={48} />
-                <p className="text-gray-500 animate-pulse">Loading updates...</p>
+                <p className="text-gray-500">Loading updates...</p>
               </div>
             ) : news.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
                 {news.map((item: any) => (
                   <article
-                    key={item.id || item.title}
+                    key={item.id}
                     onClick={() => setSelectedItem(item)}
-                    className="group bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col cursor-pointer"
+                    className="bg-white border rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition cursor-pointer"
                   >
-                    {/* Image Section */}
-                    <div className="relative h-44 w-full overflow-hidden bg-gray-200">
-                      {item.image_url && (
-                        <>
-                          <img
-                            src={item.image_url} 
-                            className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                        </>
-                      )}
-                    </div>
 
-                    <div className="p-5 flex flex-col flex-grow">
-                      <div className="flex items-center gap-2 text-green-600 mb-3">
+                    {item.image_url && (
+                      <img
+                        src={item.image_url}
+                        className="h-44 w-full object-cover"
+                      />
+                    )}
+
+                    <div className="p-5">
+
+                      <div className="flex items-center gap-2 text-green-600 mb-2">
                         <Calendar size={14} />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">
+                        <span className="text-[10px] uppercase font-bold">
                           {item.created_at
                             ? new Date(item.created_at).toLocaleDateString()
                             : "New"}
                         </span>
                       </div>
 
-                      <h4 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                      <h3 className="font-bold text-lg mb-2">
                         {item.title}
-                      </h4>
+                      </h3>
 
-                      <div className="text-gray-500 text-sm line-clamp-4 mb-6 break-words">
+                      <p className="text-sm text-gray-500 line-clamp-3">
                         {item.content}
-                      </div>
+                      </p>
+
                     </div>
+
                   </article>
                 ))}
+
               </div>
             ) : (
-              <div className="text-center py-20 bg-white rounded-3xl border border-gray-100">
-                <p className="text-gray-400 font-medium italic">No recent broadcasts found.</p>
-              </div>
+              <p className="text-center text-gray-400 py-20">
+                No updates available.
+              </p>
             )}
+
           </div>
         </div>
       )}
 
-      {/* --- Detail Modal --- */}
+      {/* DETAIL MODAL */}
       {selectedItem && (
         <div className="fixed inset-0 z-[60] bg-black/70 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-3xl bg-white rounded-2xl p-6 md:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+
+          <div className="bg-white max-w-3xl w-full rounded-2xl p-6 relative">
+
             <button
               onClick={() => setSelectedItem(null)}
               className="absolute top-4 right-4"
             >
-              <X size={22} />
+              <X size={20} />
             </button>
 
-            {/* Image Section */}
-            <div className="h-60 mb-6 rounded-xl overflow-hidden bg-gray-100">
-              {selectedItem.image_url && (
-                <img
-                  src={selectedItem.image_url} 
-                  className="w-full h-full object-cover"
-                />
-              )}
-            </div>
+            {selectedItem.image_url && (
+              <img
+                src={selectedItem.image_url}
+                className="h-60 w-full object-cover rounded-xl mb-5"
+              />
+            )}
 
-            <h2 className="text-2xl font-bold mb-3 text-center">
+            <h2 className="text-2xl font-bold mb-3">
               {selectedItem.title}
             </h2>
 
-            <p className="text-gray-700 whitespace-pre-line text-justify">
+            <p className="text-gray-700 whitespace-pre-line">
               {selectedItem.content}
             </p>
+
           </div>
+
         </div>
       )}
+
     </footer>
   );
 };

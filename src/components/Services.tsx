@@ -103,50 +103,65 @@ const Services = () => {
   const lastSix = services.slice(6);
 
   const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0 },
+    hidden: { opacity: 0, y: 25 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        delay: i * 0.08,
+        ease: "easeOut",
+      },
+    }),
+    exit: { opacity: 0, y: 20, transition: { duration: 0.3 } },
   };
 
-  const renderCard = (service, index) => (
-    <motion.div
-      key={index}
-      variants={cardVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.6, delay: index * 0.15, ease: "easeOut" }}
-      className="bg-card rounded-2xl p-8 border border-border shadow-soft hover:shadow-card hover:-translate-y-1 transition-all duration-400 group h-full flex flex-col"
-    >
-      <div className="flex items-start justify-between mb-6">
-        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center group-hover:bg-primary transition-colors duration-300">
-          <service.icon
-            size={26}
-            className="text-primary group-hover:text-primary-foreground transition-colors duration-300"
-          />
+  const ServiceCard = ({ service, index }: any) => {
+    const Icon = service.icon;
+
+    return (
+      <motion.div
+        layout
+        custom={index}
+        variants={cardVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        className="bg-card rounded-2xl p-8 border border-border shadow-soft hover:shadow-card hover:-translate-y-1 transition-all duration-300 group h-full flex flex-col"
+      >
+        <div className="flex items-start justify-between mb-6">
+          <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center group-hover:bg-primary transition-colors duration-300">
+            <Icon
+              size={26}
+              className="text-primary group-hover:text-primary-foreground transition-colors duration-300"
+            />
+          </div>
+
+          <span className="font-body text-xs font-500 text-muted-foreground bg-muted px-2.5 py-1 rounded-md">
+            {service.tag}
+          </span>
         </div>
-        <span className="font-body text-xs font-500 text-muted-foreground bg-muted px-2.5 py-1 rounded-md">
-          {service.tag}
-        </span>
-      </div>
 
-      <h3 className="font-display text-lg font-700 text-foreground mb-3 flex items-center gap-2">
-        {service.title}
-        <ArrowUpRight
-          size={16}
-          className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        />
-      </h3>
+        <h3 className="font-display text-lg font-700 text-foreground mb-3 flex items-center gap-2">
+          {service.title}
+          <ArrowUpRight
+            size={16}
+            className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          />
+        </h3>
 
-      <p className="font-body text-sm text-muted-foreground leading-relaxed flex-1">
-        {service.desc}
-      </p>
-    </motion.div>
-  );
+        <p className="font-body text-sm text-muted-foreground leading-relaxed flex-1">
+          {service.desc}
+        </p>
+      </motion.div>
+    );
+  };
 
   return (
     <section id="services" className="py-28 bg-green-light">
       <div className="container mx-auto px-4 max-w-6xl">
-        {/* Heading */}
+
+        {/* HEADER */}
         <div className="text-center mb-16">
           <ScrollReveal>
             <span className="inline-flex items-center gap-2 bg-card border border-border font-body font-500 text-xs uppercase tracking-wider px-3 py-1.5 rounded-md mb-6 shadow-soft">
@@ -168,28 +183,35 @@ const Services = () => {
           </ScrollReveal>
         </div>
 
-        {/* Grid */}
+        {/* GRID */}
         <div className="grid sm:grid-cols-3 gap-6">
-          {firstSix.map(renderCard)}
+          {firstSix.map((service, i) => (
+            <ServiceCard key={service.title} service={service} index={i} />
+          ))}
 
-          <AnimatePresence>
+          <AnimatePresence mode="popLayout">
             {showAll &&
-              lastSix.map((service, index) =>
-                renderCard(service, index + 6)
-              )}
+              lastSix.map((service, i) => (
+                <ServiceCard
+                  key={service.title}
+                  service={service}
+                  index={i + 6}
+                />
+              ))}
           </AnimatePresence>
         </div>
 
-        {/* See More / See Less */}
+        {/* TOGGLE */}
         <div className="text-center mt-12">
           <button
-            onClick={() => setShowAll(!showAll)}
+            onClick={() => setShowAll((prev) => !prev)}
             className="inline-flex items-center gap-2 text-primary font-display font-600 text-sm hover:gap-3 transition-all duration-300"
           >
             {showAll ? "See Less" : "See More"}
             {showAll ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
           </button>
         </div>
+
       </div>
     </section>
   );

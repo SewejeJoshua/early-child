@@ -15,8 +15,7 @@ const DashboardHome = () => {
           Admin Dashboard
         </h1>
 
-        <p className="text-gray-500 mt-3">
-          Use the sidebar to manage your platform, update content, and monitor activities.
+        <p className="text-gray-500 mt-3">  tform, update content, and monitor activities.
         </p>
 
       </div>

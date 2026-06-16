@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { MonthTabs } from "@/components/thrift/MonthTabs";
 import { ThriftCard } from "@/components/thrift/ThriftCard";
@@ -10,7 +10,13 @@ type HistoryItem = {
 };
 
 type DashboardData = {
-  history: HistoryItem[];
+  today: {
+    date: string;
+    status: "paid" | "unpaid";
+  };
+  streak: number;
+  total_saved: number;
+  history?: HistoryItem[];
 };
 
 export default function Dashboard() {
@@ -39,48 +45,23 @@ export default function Dashboard() {
       .catch(console.error);
   }, [token]);
 
-  // FILTER MONTH HISTORY ONLY
-  const monthHistory = useMemo(() => {
-    if (!data?.history) return [];
-
-    return data.history.filter((h) => {
-      const d = new Date(h.date);
-      return d.getFullYear() === year && d.getMonth() === month;
-    });
-  }, [data, month]);
-
-  // GET TODAY (FOR PAYMENT TARGET DAY)
-  const today = new Date();
-  const currentDay = today.getDate();
-
   async function handlePay() {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_ECHILDHOOD_API}/savings/payments/initialize/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            month,
-            year,
-            day: currentDay,
-          }),
-        }
-      );
-
-      const json = await res.json();
-
-      if (json?.authorization_url) {
-        window.location.href = json.authorization_url;
-      } else {
-        alert("Payment failed to initialize");
+    const res = await fetch(
+      `${import.meta.env.VITE_ECHILDHOOD_API}/payments/initiate-monthly/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ month, year }),
       }
-    } catch (err) {
-      console.error(err);
-      alert("Payment error");
+    );
+
+    const json = await res.json();
+
+    if (json?.authorization_url) {
+      window.location.href = json.authorization_url;
     }
   }
 
@@ -95,7 +76,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       {/* HEADER */}
-      <header className="border-b p-3 flex justify-between items-center">
+      <header className="border-b p-4 flex justify-between items-center">
         <Link to="/" className="font-bold">
           Verdant
         </Link>
@@ -105,34 +86,46 @@ export default function Dashboard() {
             localStorage.clear();
             navigate("/thrift/login");
           }}
-          className="text-sm px-3 py-1 border rounded-full"
         >
           Logout
         </button>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-6 space-y-5">
+      <main className="max-w-6xl mx-auto p-6 space-y-6">
 
-        {/* MONTH SELECTOR */}
-        <MonthTabs month={month} setMonth={setMonth} />
+        {/* 🔥 GLOBAL STATS (ONLY ONCE — FIXED) */}
+        <div className="grid grid-cols-2 gap-4">
+          <Stat title="Total Saved (All Time)" value={`₦${data.total_saved ?? 0}`} />
+          <Stat title="Streak (All Time)" value={`${data.streak ?? 0} days`} />
+        </div>
 
-        {/* PAY BUTTON (DAY-BASED) */}
+        {/* 💳 PAY BUTTON (MONTHLY ACTION) */}
         <button
           onClick={handlePay}
-          className="px-5 py-3 bg-primary text-white rounded-full font-semibold w-full md:w-auto"
+          className="px-4 py-2 bg-primary text-white rounded-full"
         >
-          Pay
+          Pay for {new Date(0, month).toLocaleString("default", { month: "long" })}
         </button>
 
-        {/* THRIFT CARD */}
-        <div className="max-w-3xl mx-auto">
-          <ThriftCard
-            month={month}
-            year={year}
-            dashboard={{ history: monthHistory }}
-          />
-        </div>
+        {/* 📅 MONTH SELECTOR */}
+        <MonthTabs month={month} setMonth={setMonth} />
+
+        {/* 📊 MONTHLY CARD */}
+        <ThriftCard
+          month={month}
+          year={year}
+          dashboard={data}
+        />
       </main>
+    </div>
+  );
+}
+
+function Stat({ title, value }: { title: string; value: string }) {
+  return (
+    <div className="border rounded-xl p-4 bg-card">
+      <p className="text-xs text-muted-foreground">{title}</p>
+      <p className="text-lg font-bold">{value}</p>
     </div>
   );
 }

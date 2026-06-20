@@ -24,7 +24,7 @@ import Childdashhome from "@/components/childrenday/Childdashhome";
 import Registered from "@/components/childrenday/Registered";
 
 // thrift user
-import Landing from "@/components/thrift/Landing";
+import Landing from "@/components/thrift/landing";
 import SignupPage from "@/components/thrift/signup";
 import LoginPage from "@/components/thrift/login";
 import Dashboard from "@/components/thrift/dashboard";

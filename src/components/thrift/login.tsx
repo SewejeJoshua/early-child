@@ -1,134 +1,114 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+function decodeToken(token: string) {
+  try {
+    const payload = token.split(".")[1];
+    return JSON.parse(atob(payload));
+  } catch {
+    return null;
+  }
+}
 
 export default function LoginPage() {
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-
-    setError("");
     setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch(
+      const res = await fetch(
         `${import.meta.env.VITE_ECHILDHOOD_API}/accounts/login/`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            username: username.trim(), // ✅ IMPORTANT FIX
+            username: username.trim(),
             password,
           }),
         }
       );
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (!response.ok) {
-        throw new Error(
-          data?.detail || data?.message || "Invalid login credentials"
-        );
+      if (!res.ok) {
+        setError(data?.detail || "Login failed");
+        return;
       }
 
-      // ✅ STORE FULL USER
-      localStorage.setItem("user", JSON.stringify(data));
+      // store tokens
+      localStorage.setItem("accessToken", data.access);
+      localStorage.setItem("refreshToken", data.refresh);
 
-      // ✅ JWT TOKENS (CORE FIX)
-      if (data?.access) {
-        localStorage.setItem("accessToken", data.access);
-      }
+      // decode token
+      const payload = decodeToken(data.access);
 
-      if (data?.refresh) {
-        localStorage.setItem("refreshToken", data.refresh);
-      }
+      console.log("TOKEN PAYLOAD:", payload);
 
-      // Optional: store expiry-aware flag
-      localStorage.setItem("isAuthenticated", "true");
+      // ----------------------------
+      // 🔥 STRICT ADMIN DETECTION
+      // ----------------------------
 
-      // Optional: decode role safely fallback
-      const role = data?.role || "user";
+      const userId = String(payload?.user_id);
 
-      // Redirect based on role
-      if (role === "admin") {
-        navigate("/thrift/admin");
+      // IMPORTANT: backend said admin is determined by token
+      const isAdmin =
+        payload?.is_staff === true ||
+        payload?.is_admin === true ||
+        payload?.role === "admin" ||
+        userId === "1"; // fallback rule
+
+      if (isAdmin) {
+        navigate("/thrift_admin/admindashboard", { replace: true });
       } else {
-        navigate("/thrift/dashboard");
+        navigate("/thrift/dashboard", { replace: true });
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md bg-card border border-border rounded-2xl p-6 shadow-lg">
-        <h1 className="text-2xl font-bold text-center">
-          Welcome back
-        </h1>
-        <p className="text-sm text-muted-foreground text-center mt-1">
-          Log in to your thrift card.
-        </p>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <form
+        onSubmit={handleLogin}
+        className="w-full max-w-md p-6 border rounded-xl space-y-4"
+      >
+        <h1 className="text-xl font-bold">Login</h1>
 
-        <form onSubmit={onSubmit} className="space-y-4 mt-6">
-          {/* Username (Email input UI but sent as username) */}
-          <input
-            type="text"
-            placeholder="Email"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            className="w-full px-4 py-3 rounded-xl border border-border bg-background outline-none focus:border-primary"
-          />
+        <input
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Email"
+          className="w-full p-3 border rounded"
+        />
 
-          {/* Password */}
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-4 py-3 rounded-xl border border-border bg-background outline-none focus:border-primary"
-          />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          className="w-full p-3 border rounded"
+        />
 
-          {/* Error */}
-          {error && (
-            <p className="text-sm text-red-500">
-              {error}
-            </p>
-          )}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:opacity-90 transition disabled:opacity-50"
-          >
-            {loading ? "Logging In..." : "Log In"}
-          </button>
-
-          {/* Signup link */}
-          <p className="text-sm text-center text-muted-foreground">
-            New here?{" "}
-            <Link
-              to="/thrift/signup"
-              className="text-primary font-semibold hover:underline"
-            >
-              Create an account
-            </Link>
-          </p>
-        </form>
-      </div>
+        <button
+          disabled={loading}
+          className="w-full bg-primary text-white p-3 rounded"
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
+      </form>
     </div>
   );
 }

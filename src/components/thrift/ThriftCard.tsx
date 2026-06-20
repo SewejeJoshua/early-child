@@ -7,12 +7,15 @@ type HistoryItem = {
 type Props = {
   month: number;
   year: number;
-  dashboard: {
-    today: { date: string; status: string };
-    streak: number;
-    total_saved: number;
-    history?: HistoryItem[];
-  };
+  dashboard:
+    | {
+        history?: HistoryItem[];
+      }
+    | null
+    | undefined;
+
+  isAdmin?: boolean;
+  onToggle?: (date: string, status: "paid" | "unpaid") => void;
 };
 
 function daysInMonth(y: number, m: number) {
@@ -21,24 +24,47 @@ function daysInMonth(y: number, m: number) {
 
 const MONTHS = [
   "January","February","March","April","May","June",
-  "July","August","September","October","November","December"
+  "July","August","September","October","November","December",
 ];
 
-export function ThriftCard({ month, year, dashboard }: Props) {
+export function ThriftCard({
+  month,
+  year,
+  dashboard,
+  isAdmin = false,
+  onToggle,
+}: Props) {
   const days = daysInMonth(year, month);
 
-  // 🔥 SAFE FALLBACK (prevents crash)
-  const history = dashboard.history ?? [];
+  const rawHistory: HistoryItem[] = Array.isArray(dashboard?.history)
+    ? dashboard.history
+    : [];
 
-  // 🔥 convert to Set safely
-  const paidDates = new Set(
-    history
-      .filter((h) => h?.status === "paid")
-      .map((h) => h.date)
-  );
+  // 🔥 STEP 1: STRICT MONTH EXTRACTION (NO MIXING)
+  const monthKey = `${year}-${String(month + 1).padStart(2, "0")}`;
+
+  const monthHistory = rawHistory.filter((h) => {
+    const d = new Date(h.date);
+    const hKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    return hKey === monthKey;
+  });
+
+  // 🔥 STEP 2: BUILD CLEAN INDEX (ONLY THIS MONTH)
+  const statusMap: Record<string, "paid" | "unpaid"> = {};
+
+  monthHistory.forEach((h) => {
+    statusMap[h.date] = h.status;
+  });
 
   function formatDate(day: number) {
-    return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    return `${year}-${String(month + 1).padStart(2, "0")}-${String(
+      day
+    ).padStart(2, "0")}`;
+  }
+
+  function isPastDate(date: string) {
+    const today = new Date().toISOString().split("T")[0];
+    return date < today;
   }
 
   const weeks = [
@@ -57,25 +83,64 @@ export function ThriftCard({ month, year, dashboard }: Props) {
       </div>
 
       <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-        {weeks.map((w) => (
-          <div key={w.label} className="border rounded-xl">
+        {weeks.map((week) => (
+          <div key={week.label} className="border rounded-xl">
             <div className="p-2 text-xs font-bold bg-primary/10">
-              {w.label}
+              {week.label}
             </div>
 
             <div className="p-2 space-y-2">
-              {w.days.map((d) => {
-                const key = formatDate(d);
-                const paid = paidDates.has(key);
+              {week.days.map((day) => {
+                const date = formatDate(day);
+
+                // 🔥 ONLY THIS MONTH'S DATA IS VALID
+                const status = statusMap[date] ?? "unpaid";
+
+                const paid = status === "paid";
+                const missed = status === "unpaid" && isPastDate(date);
 
                 return (
-                  <div key={d} className="flex justify-between text-sm">
-                    <span>Day {d}</span>
-                    <span
-                      className={`size-3 rounded ${
-                        paid ? "bg-green-500" : "bg-gray-300"
-                      }`}
-                    />
+                  <div
+                    key={day}
+                    className="flex items-center justify-between text-sm"
+                  >
+                    <span>Day {day}</span>
+
+                    {isAdmin ? (
+                      <button
+                        type="button"
+                        onClick={() => onToggle?.(date, status)}
+                        className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+                          paid
+                            ? "bg-green-500 border-green-500"
+                            : missed
+                            ? "bg-red-500 border-red-500"
+                            : "bg-gray-200 border-gray-300"
+                        }`}
+                      >
+                        {paid && (
+                          <span className="text-white text-[10px] font-bold">
+                            ✓
+                          </span>
+                        )}
+                      </button>
+                    ) : (
+                      <div
+                        className={`w-5 h-5 rounded border flex items-center justify-center ${
+                          paid
+                            ? "bg-green-500 border-green-500"
+                            : missed
+                            ? "bg-red-500 border-red-500"
+                            : "bg-gray-200 border-gray-300"
+                        }`}
+                      >
+                        {paid && (
+                          <span className="text-white text-[10px] font-bold">
+                            ✓
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -87,6 +152,6 @@ export function ThriftCard({ month, year, dashboard }: Props) {
   );
 }
 
-function range(s: number, e: number) {
-  return Array.from({ length: e - s + 1 }, (_, i) => s + i);
+function range(start: number, end: number) {
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 }

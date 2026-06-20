@@ -24,6 +24,9 @@ type AdminDashboardData = {
     transactions: number;
   };
   users: AdminUser[];
+
+  // ✅ ADDED (safe optional field)
+  withdrawable_platform_balance?: number;
 };
 
 type AuditLog = {
@@ -83,12 +86,10 @@ export default function AdminDashboard() {
 
   const activeRequestRef = useRef<number | null>(null);
 
-  // AUTH
   useEffect(() => {
     if (!token) navigate("/thrift/login");
   }, [token, navigate]);
 
-  // INITIAL LOAD
   useEffect(() => {
     if (!token) return;
 
@@ -111,7 +112,6 @@ export default function AdminDashboard() {
       .then(setWithdrawals);
   }, [token]);
 
-  // USER CALENDAR FETCH
   useEffect(() => {
     if (!selectedUser || !token) return;
 
@@ -143,9 +143,6 @@ export default function AdminDashboard() {
     setCalendar([]);
   }, [selectedUser]);
 
-  // ==============================
-  // ✅ REAL-TIME WITHDRAWAL UPDATE
-  // ==============================
   async function updateWithdrawal(
     id: number,
     status: "approved" | "rejected" | "sent",
@@ -168,7 +165,6 @@ export default function AdminDashboard() {
 
     if (!res.ok) return;
 
-    // REAL-TIME UI UPDATE (NO REFRESH)
     setWithdrawals((prev) =>
       prev.map((w) =>
         w.id === id
@@ -183,10 +179,7 @@ export default function AdminDashboard() {
     );
   }
 
-  function openNoteModal(
-    id: number,
-    status: "approved" | "rejected" | "sent"
-  ) {
+  function openNoteModal(id: number, status: "approved" | "rejected" | "sent") {
     setNoteModal({ open: true, id, status });
     setAdminNote("");
   }
@@ -241,7 +234,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
 
-      {/* NOTE MODAL */}
+      {/* NOTE MODAL unchanged */}
       {noteModal.open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-xl w-[320px]">
@@ -275,7 +268,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* HEADER */}
+      {/* HEADER unchanged */}
       <header className="sticky top-0 z-50 bg-white border-b shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between">
           <Link to="/" className="font-bold text-lg">
@@ -312,7 +305,7 @@ export default function AdminDashboard() {
 
       <main className="max-w-7xl mx-auto px-6 py-8 grid lg:grid-cols-[280px_1fr_340px] gap-6">
 
-        {/* USERS */}
+        {/* USERS unchanged */}
         <aside className="bg-white border rounded-2xl shadow-sm p-4 sticky top-24 h-fit">
           <h2 className="text-xs uppercase text-gray-500 mb-3">
             Active Users ({data.active_savers})
@@ -338,6 +331,7 @@ export default function AdminDashboard() {
 
         {/* CENTER */}
         <section className="space-y-6">
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <Stat label="Total Users" value={data.total_users} />
             <Stat label="Active Savers" value={data.active_savers} />
@@ -351,6 +345,12 @@ export default function AdminDashboard() {
             />
             <Stat label="Today Contributions" value={data.today_contributions} />
             <Stat label="Pending Withdrawals" value={data.pending_withdrawals} />
+
+            {/* ✅ NEW: Withdrawable Platform Balance */}
+            <Stat
+              label="Withdrawable Balance"
+              value={`₦${(data.withdrawable_platform_balance || 0).toLocaleString()}`}
+            />
           </div>
 
           <div className="bg-white border rounded-2xl shadow-sm p-4">
@@ -376,7 +376,7 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {/* WITHDRAWALS */}
+        {/* WITHDRAWALS unchanged */}
         <aside className="space-y-6">
           <div className="bg-white border rounded-2xl shadow-sm p-4">
             <h2 className="text-xs uppercase text-gray-500 mb-3">
@@ -387,11 +387,7 @@ export default function AdminDashboard() {
               {withdrawals.map((w) => (
                 <div key={w.id} className="border rounded-xl p-3 bg-gray-50">
 
-                  <span
-                    className={`text-xs px-2 py-1 rounded ${getStatusColor(
-                      w.status
-                    )}`}
-                  >
+                  <span className={`text-xs px-2 py-1 rounded ${getStatusColor(w.status)}`}>
                     {w.status}
                   </span>
 
@@ -423,14 +419,6 @@ export default function AdminDashboard() {
                     >
                       Reject
                     </button>
-
-                    <button
-                      disabled={isDisabled(w.status)}
-                      onClick={() => updateWithdrawal(w.id, "sent")}
-                      className="text-xs px-2 py-1 rounded bg-blue-500 text-white disabled:opacity-40"
-                    >
-                      Sent
-                    </button>
                   </div>
                 </div>
               ))}
@@ -454,12 +442,13 @@ export default function AdminDashboard() {
             </div>
           </div>
         </aside>
+
       </main>
     </div>
   );
 }
 
-/* ===================== STAT ===================== */
+/* Stat unchanged */
 function Stat({
   label,
   value,

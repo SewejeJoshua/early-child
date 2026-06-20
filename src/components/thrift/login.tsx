@@ -1,10 +1,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Earlylogo from "@/assets/images/early-logo.jpeg";
 
 function decodeToken(token: string) {
   try {
-    const payload = token.split(".")[1];
-    return JSON.parse(atob(payload));
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+
+    return JSON.parse(jsonPayload);
   } catch {
     return null;
   }
@@ -39,57 +48,54 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data?.detail || "Login failed");
+        setError(data?.detail || data?.message || "Login failed");
         return;
       }
 
-      // store tokens
       localStorage.setItem("accessToken", data.access);
       localStorage.setItem("refreshToken", data.refresh);
 
-      // decode token
       const payload = decodeToken(data.access);
 
       console.log("TOKEN PAYLOAD:", payload);
 
-      // ----------------------------
-      // 🔥 STRICT ADMIN DETECTION
-      // ----------------------------
+      // ✅ CLEAN ROLE CHECK (no unsafe fallback)
+      const role = payload?.role || (payload?.is_staff ? "admin" : "user");
 
-      const userId = String(payload?.user_id);
-
-      // IMPORTANT: backend said admin is determined by token
-      const isAdmin =
-        payload?.is_staff === true ||
-        payload?.is_admin === true ||
-        payload?.role === "admin" ||
-        userId === "1"; // fallback rule
-
-      if (isAdmin) {
+      if (role === "admin") {
         navigate("/thrift_admin/admindashboard", { replace: true });
       } else {
         navigate("/thrift/dashboard", { replace: true });
       }
     } catch (err: any) {
-      setError(err.message || "Something went wrong");
+      setError(err?.message || "Network error. Try again.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <form
         onSubmit={handleLogin}
-        className="w-full max-w-md p-6 border rounded-xl space-y-4"
+        className="w-full max-w-md p-6 border rounded-xl space-y-4 bg-white shadow"
       >
-        <h1 className="text-xl font-bold">Login</h1>
+        <div className="text-center space-y-2">
+          <img
+            src={Earlylogo}
+            className="w-16 h-16 mx-auto rounded-full"
+            alt="Logo"
+          />
+          <h1 className="text-xl font-bold">Login here</h1>
+          <p className="text-sm text-gray-500">Welcome back </p>
+        </div>
 
         <input
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          placeholder="Email"
-          className="w-full p-3 border rounded"
+          placeholder="Email or Username"
+          disabled={loading}
+          className="w-full p-3 border rounded disabled:opacity-50"
         />
 
         <input
@@ -97,14 +103,19 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
-          className="w-full p-3 border rounded"
+          disabled={loading}
+          className="w-full p-3 border rounded disabled:opacity-50"
         />
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {error && (
+          <div className="p-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded">
+            {error}
+          </div>
+        )}
 
         <button
           disabled={loading}
-          className="w-full bg-primary text-white p-3 rounded"
+          className="w-full bg-primary text-white p-3 rounded disabled:opacity-60"
         >
           {loading ? "Logging in..." : "Login"}
         </button>

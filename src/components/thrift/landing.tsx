@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import Earlylogo from "@/assets/images/early-logo.jpeg";
 
 export default function Landing() {
   return (
@@ -6,10 +7,10 @@ export default function Landing() {
       <header className="sticky top-0 z-20 backdrop-blur bg-background/80 border-b border-border">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
           <Link to="/" className="flex items-center gap-2">
-            <div className="size-8 rounded-lg bg-primary grid place-items-center text-primary-foreground font-bold">
-              V
+            <div className="size-8 rounded-lg  grid place-items-center text-primary-foreground font-bold">
+             <img src={Earlylogo} className="rounded-full" alt="Logo" />
             </div>
-            <span className="font-bold text-lg">Verdant</span>
+            <span className="font-bold text-lg">Early Childood</span>
           </Link>
 
           <nav className="flex items-center gap-3">
@@ -159,7 +160,7 @@ export default function Landing() {
 
       <footer className="border-t border-border mt-16">
         <div className="max-w-6xl mx-auto px-6 py-6 text-sm text-muted-foreground flex justify-between">
-          <span>© {new Date().getFullYear()} Verdant</span>
+          <span>© {new Date().getFullYear()} Early Childhood</span>
 
           <Link to="/thrift/login" className="hover:text-foreground">
             Open Thrift →

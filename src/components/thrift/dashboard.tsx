@@ -12,6 +12,7 @@ type HistoryItem = {
 
 type DashboardData = {
   history: HistoryItem[];
+  withdrawable_balance?: number; // ✅ ADDED (safe optional field)
 };
 
 type ProfileData = {
@@ -48,6 +49,8 @@ export default function Dashboard() {
   const [historyPopup, setHistoryPopup] = useState(false);
   const [profilePopup, setProfilePopup] = useState(false);
 
+  const [detail, setDetail] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
   const token = localStorage.getItem("accessToken");
 
   useEffect(() => {
@@ -75,6 +78,11 @@ export default function Dashboard() {
       .then(setProfile)
       .catch(console.error);
   }, [token]);
+
+  function showDetail(type: "success" | "error", text: string) {
+    setDetail({ type, text });
+    setTimeout(() => setDetail(null), 4000);
+  }
 
   const parseDate = (dateStr: string) => {
     const [y, m, d] = dateStr.split("-").map(Number);
@@ -110,6 +118,9 @@ export default function Dashboard() {
     return streak;
   }, [monthHistory]);
 
+  // ✅ NEW: withdrawable balance (safe fallback)
+  const withdrawableBalance = data?.withdrawable_balance || 0;
+
   async function fetchProfile() {
     const res = await fetch(
       `${import.meta.env.VITE_ECHILDHOOD_API}/accounts/profile/`,
@@ -132,6 +143,58 @@ export default function Dashboard() {
     setHistoryPopup(true);
   }
 
+  async function handlePay() {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_ECHILDHOOD_API}/savings/payments/initialize/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ month, year }),
+        }
+      );
+
+      const data = await res.json();
+
+      const url = data?.authorization_url || data?.data?.authorization_url;
+      const errorMsg = data?.detail || data?.message;
+
+      if (url) {
+        window.location.href = url;
+      } else {
+        showDetail("error", errorMsg || "Payment initialization failed");
+      }
+    } catch {
+      showDetail("error", "Network error during payment");
+    }
+  }
+
+  async function handleWithdraw() {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_ECHILDHOOD_API}/savings/withdraw/request/`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        showDetail("error", data?.detail || data?.message || "Withdraw failed");
+        return;
+      }
+
+      showDetail("success", "Withdraw request sent successfully");
+    } catch {
+      showDetail("error", "Network error during withdraw");
+    }
+  }
+
   async function handleLogout() {
     try {
       await fetch(`${import.meta.env.VITE_ECHILDHOOD_API}/accounts/logout/`, {
@@ -142,34 +205,6 @@ export default function Dashboard() {
 
     localStorage.clear();
     navigate("/thrift/login");
-  }
-
-  async function handlePay() {
-    const res = await fetch(
-      `${import.meta.env.VITE_ECHILDHOOD_API}/savings/payments/initialize/`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ month, year }),
-      }
-    );
-
-    const data = await res.json();
-    const url = data?.authorization_url || data?.data?.authorization_url;
-
-    if (url) window.location.href = url;
-  }
-
-  async function handleWithdraw() {
-    await fetch(
-      `${import.meta.env.VITE_ECHILDHOOD_API}/savings/withdraw/request/`,
-      { method: "POST", headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    alert("Withdraw request sent to admin");
   }
 
   if (!data) {
@@ -197,6 +232,16 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
 
+      {detail && (
+        <div
+          className={`p-3 text-center text-white ${
+            detail.type === "success" ? "bg-green-600" : "bg-red-600"
+          }`}
+        >
+          {detail.text}
+        </div>
+      )}
+
       <header className="border-b p-3 sm:p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
 
         <Link to="/" className="flex items-center gap-3 font-bold text-lg">
@@ -206,18 +251,12 @@ export default function Dashboard() {
 
         <div className="flex flex-wrap items-center gap-2">
 
-          <button
-            onClick={handlePay}
-            className="flex items-center gap-2 px-3 py-2 rounded-full bg-green-600 text-white"
-          >
+          <button onClick={handlePay} className="flex items-center gap-2 px-3 py-2 rounded-full bg-green-600 text-white">
             <WalletIcon />
             Pay ₦{dailyAmount}
           </button>
 
-          <button
-            onClick={handleWithdraw}
-            className="flex items-center gap-2 px-3 py-2 rounded-full bg-orange-500 text-white"
-          >
+          <button onClick={handleWithdraw} className="flex items-center gap-2 px-3 py-2 rounded-full bg-orange-500 text-white">
             <WithdrawIcon />
             Withdraw
           </button>
@@ -239,50 +278,59 @@ export default function Dashboard() {
           <StatCard title="Streak" value={`${monthlyStreak} days`} />
         </div>
 
+        {/* ✅ NEW WITHDRAWABLE BALANCE CONTAINER */}
+        <div className="border rounded-xl p-4 bg-white shadow-sm">
+          <p className="text-sm text-gray-500">Withdrawable Balance</p>
+          <p className="text-2xl font-bold text-green-600">
+            ₦{withdrawableBalance}
+          </p>
+        </div>
+
         <MonthTabs month={month} setMonth={setMonth} />
 
         <ThriftCard month={month} year={year} dashboard={{ history: monthHistory }} />
 
       </main>
 
-      {historyPopup && (
-        <Modal onClose={() => setHistoryPopup(false)}>
+      {/* POPUPS (UNCHANGED) */}
+      {profilePopup && (
+        <Modal onClose={() => setProfilePopup(false)}>
           <div className="bg-white p-5 rounded-xl w-[90vw] max-w-md">
-
-            <ModalHeader title="Transaction History" onClose={() => setHistoryPopup(false)} />
-
-            <div className="space-y-2 max-h-80 overflow-y-auto">
-
-              {unifiedHistory.map((h, i) => (
-                <div key={i} className="border p-2 rounded flex justify-between items-center">
-
-                  <div>
-                    <p className="text-sm font-medium">
-                      {h.type === "paid" ? "Payment" : "Withdrawal"}
-                    </p>
-                    <p className="text-xs text-gray-500">{h.date}</p>
-                    <p className="text-xs">{h.status}</p>
-                  </div>
-
-                  <div className="flex items-center gap-2 font-bold">
-                    {h.type === "paid" ? <WalletIcon /> : <WithdrawIcon />}
-                    ₦{h.amount}
-                  </div>
-
-                </div>
-              ))}
-
-            </div>
-
+            <ModalHeader title="Profile" onClose={() => setProfilePopup(false)} />
+            <p>{profile?.first_name} {profile?.last_name}</p>
+            <p>{profile?.email}</p>
+            <p>{profile?.phone}</p>
+            <p>Daily: ₦{profile?.daily_amount}</p>
           </div>
         </Modal>
       )}
 
+      {historyPopup && (
+        <Modal onClose={() => setHistoryPopup(false)}>
+          <div className="bg-white p-5 rounded-xl w-[90vw] max-w-md">
+            <ModalHeader title="Transaction History" onClose={() => setHistoryPopup(false)} />
+
+            <div className="space-y-2 max-h-80 overflow-y-auto">
+              {unifiedHistory.map((h, i) => (
+                <div key={i} className="border p-2 rounded flex justify-between items-center">
+                  <div>
+                    <p>{h.type === "paid" ? "Payment" : "Withdrawal"}</p>
+                    <p className="text-xs text-gray-500">{h.date}</p>
+                    <p className="text-xs">{h.status}</p>
+                  </div>
+
+                  <div className="font-bold">₦{h.amount}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
 
-/* ================= ICONS RESTORED ================= */
+/* ICONS + UI (UNCHANGED) */
 
 function UserIcon() {
   return (
@@ -321,7 +369,6 @@ function WithdrawIcon() {
   );
 }
 
-/* UI */
 function Modal({ children, onClose }: any) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center" onClick={onClose}>

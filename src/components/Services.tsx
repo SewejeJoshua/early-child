@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   GraduationCap,
   Users,
@@ -98,6 +99,7 @@ const services = [
 
 const Services = () => {
   const [showAll, setShowAll] = useState(false);
+  const navigate = useNavigate();
 
   const firstSix = services.slice(0, 6);
   const lastSix = services.slice(6);
@@ -116,8 +118,16 @@ const Services = () => {
     exit: { opacity: 0, y: 20, transition: { duration: 0.3 } },
   };
 
+  const handleClick = (title: string) => {
+    if (title === "E-SAV") {
+      navigate("/thrift/landing");
+    }
+  };
+
   const ServiceCard = ({ service, index }: any) => {
     const Icon = service.icon;
+
+    const isSav = service.title === "E-SAV";
 
     return (
       <motion.div
@@ -127,7 +137,10 @@ const Services = () => {
         initial="hidden"
         animate="visible"
         exit="exit"
-        className="bg-card rounded-2xl p-8 border border-border shadow-soft hover:shadow-card hover:-translate-y-1 transition-all duration-300 group h-full flex flex-col"
+        onClick={() => handleClick(service.title)}
+        className={`bg-card rounded-2xl p-8 border border-border shadow-soft hover:shadow-card hover:-translate-y-1 transition-all duration-300 group h-full flex flex-col ${
+          isSav ? "cursor-pointer hover:border-primary" : ""
+        }`}
       >
         <div className="flex items-start justify-between mb-6">
           <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center group-hover:bg-primary transition-colors duration-300">

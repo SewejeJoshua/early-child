@@ -59,7 +59,7 @@ const App = () => (
           <Route path="/childrenday" element={<Childadminlogin />} />
 
           {/* THRIFT USER */}
-          <Route path="/thrift" element={<Landing />} />
+          <Route path="/thrift/landing" element={<Landing />} />
           <Route path="/thrift/signup" element={<SignupPage />} />
           <Route path="/thrift/login" element={<LoginPage />} />
           <Route path="/thrift/dashboard" element={<Dashboard />} />

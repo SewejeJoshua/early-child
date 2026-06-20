@@ -25,8 +25,8 @@ type AdminDashboardData = {
   };
   users: AdminUser[];
 
-  // ✅ ADDED (safe optional field)
-  withdrawable_platform_balance?: number;
+  // ✅ FIXED: matches backend exactly
+  total_withdrawable_balance?: number;
 };
 
 type AuditLog = {
@@ -346,10 +346,10 @@ export default function AdminDashboard() {
             <Stat label="Today Contributions" value={data.today_contributions} />
             <Stat label="Pending Withdrawals" value={data.pending_withdrawals} />
 
-            {/* ✅ NEW: Withdrawable Platform Balance */}
+            {/* FIXED FIELD */}
             <Stat
               label="Withdrawable Balance"
-              value={`₦${(data.withdrawable_platform_balance || 0).toLocaleString()}`}
+              value={`₦${(data.total_withdrawable_balance || 0).toLocaleString()}`}
             />
           </div>
 

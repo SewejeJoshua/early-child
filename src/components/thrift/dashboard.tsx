@@ -11,8 +11,15 @@ type HistoryItem = {
 };
 
 type DashboardData = {
+  full_name?: string;
+  today?: {
+    date: string;
+    status: "paid" | "unpaid";
+  };
+  streak?: number;
+  total_saved?: number;
+  withdrawable_balance?: number;
   history: HistoryItem[];
-  withdrawable_balance?: number; // ✅ ADDED (safe optional field)
 };
 
 type ProfileData = {
@@ -118,7 +125,6 @@ export default function Dashboard() {
     return streak;
   }, [monthHistory]);
 
-  // ✅ NEW: withdrawable balance (safe fallback)
   const withdrawableBalance = data?.withdrawable_balance || 0;
 
   async function fetchProfile() {
@@ -211,7 +217,11 @@ export default function Dashboard() {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
-  const username = profile?.first_name || "User";
+  const username =
+    profile?.first_name ||
+    data?.full_name?.split(" ")[0] ||
+    "User";
+
   const dailyAmount = profile?.daily_amount || 0;
 
   const unifiedHistory: UnifiedHistory[] = [
@@ -278,7 +288,6 @@ export default function Dashboard() {
           <StatCard title="Streak" value={`${monthlyStreak} days`} />
         </div>
 
-        {/* ✅ NEW WITHDRAWABLE BALANCE CONTAINER */}
         <div className="border rounded-xl p-4 bg-white shadow-sm">
           <p className="text-sm text-gray-500">Withdrawable Balance</p>
           <p className="text-2xl font-bold text-green-600">
@@ -292,7 +301,6 @@ export default function Dashboard() {
 
       </main>
 
-      {/* POPUPS (UNCHANGED) */}
       {profilePopup && (
         <Modal onClose={() => setProfilePopup(false)}>
           <div className="bg-white p-5 rounded-xl w-[90vw] max-w-md">

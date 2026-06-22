@@ -296,7 +296,7 @@ export default function Dashboard() {
         <ThriftCard month={month} year={year} dashboard={{ history: monthHistory }} />
       </main>
 
-      {/* FOOTER (ADDED HERE) */}
+      
       <footer className="border-t border-border mt-16 bg-background/60 backdrop-blur">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 

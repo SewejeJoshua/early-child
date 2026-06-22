@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Earlylogo from "@/assets/images/early-logo.jpeg";
 
 function decodeToken(token: string) {
@@ -37,7 +37,9 @@ export default function LoginPage() {
         `${import.meta.env.VITE_ECHILDHOOD_API}/accounts/login/`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             username: username.trim(),
             password,
@@ -59,7 +61,7 @@ export default function LoginPage() {
 
       console.log("TOKEN PAYLOAD:", payload);
 
-      // ✅ CLEAN ROLE CHECK (no unsafe fallback)
+      // Clean role check
       const role = payload?.role || (payload?.is_staff ? "admin" : "user");
 
       if (role === "admin") {
@@ -86,8 +88,12 @@ export default function LoginPage() {
             className="w-16 h-16 mx-auto rounded-full"
             alt="Logo"
           />
+
           <h1 className="text-xl font-bold">Login here</h1>
-          <p className="text-sm text-gray-500">Welcome back </p>
+
+          <p className="text-sm text-gray-500">
+            Welcome back
+          </p>
         </div>
 
         <input
@@ -95,7 +101,7 @@ export default function LoginPage() {
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Email or Username"
           disabled={loading}
-          className="w-full p-3 border rounded disabled:opacity-50"
+          className="w-full p-3 border rounded disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary"
         />
 
         <input
@@ -104,7 +110,7 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           disabled={loading}
-          className="w-full p-3 border rounded disabled:opacity-50"
+          className="w-full p-3 border rounded disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary"
         />
 
         {error && (
@@ -114,11 +120,25 @@ export default function LoginPage() {
         )}
 
         <button
+          type="submit"
           disabled={loading}
-          className="w-full bg-primary text-white p-3 rounded disabled:opacity-60"
+          className="w-full bg-primary text-white p-3 rounded font-medium hover:opacity-90 transition disabled:opacity-60"
         >
           {loading ? "Logging in..." : "Login"}
         </button>
+
+        {/* Signup Link */}
+        <div className="pt-2 text-center border-t">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{" "}
+            <Link
+              to="/thrift/signup"
+              className="font-semibold text-primary hover:underline"
+            >
+              Sign up here
+            </Link>
+          </p>
+        </div>
       </form>
     </div>
   );

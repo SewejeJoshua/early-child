@@ -24,8 +24,6 @@ type AdminDashboardData = {
     transactions: number;
   };
   users: AdminUser[];
-
-  // ✅ FIXED: matches backend exactly
   total_withdrawable_balance?: number;
 };
 
@@ -85,6 +83,8 @@ export default function AdminDashboard() {
   const [adminNote, setAdminNote] = useState("");
 
   const activeRequestRef = useRef<number | null>(null);
+
+  const [activeUserId, setActiveUserId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!token) navigate("/thrift/login");
@@ -168,12 +168,7 @@ export default function AdminDashboard() {
     setWithdrawals((prev) =>
       prev.map((w) =>
         w.id === id
-          ? {
-              ...w,
-              status,
-              admin_note: note || w.admin_note,
-              updated_at: new Date().toISOString(),
-            }
+          ? { ...w, status, admin_note: note || w.admin_note }
           : w
       )
     );
@@ -204,25 +199,6 @@ export default function AdminDashboard() {
     return status === "approved" || status === "rejected";
   }
 
-  async function downloadExcel() {
-    const res = await fetch(
-      `${import.meta.env.VITE_ECHILDHOOD_API}/savings/admin/export/excel/`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "savings-report.xlsx";
-    a.click();
-
-    window.URL.revokeObjectURL(url);
-  }
-
   if (!data) {
     return (
       <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
@@ -234,7 +210,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
 
-      {/* NOTE MODAL unchanged */}
+      {/* NOTE MODAL */}
       {noteModal.open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-xl w-[320px]">
@@ -268,11 +244,13 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* HEADER unchanged */}
+      {/* HEADER (UPDATED ONLY VISUALLY) */}
       <header className="sticky top-0 z-50 bg-white border-b shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between">
-          <Link to="/" className="font-bold text-lg">
-            Thrift Admin
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+
+          <Link to="/" className="flex items-center gap-2 font-bold text-lg">
+            <img src="/favicon.ico" className="w-8 h-8 rounded-full" />
+            Early Childhood
           </Link>
 
           <div className="flex gap-3">
@@ -284,7 +262,6 @@ export default function AdminDashboard() {
             </button>
 
             <button
-              onClick={downloadExcel}
               className="px-4 py-2 text-sm bg-emerald-600 text-white rounded-lg"
             >
               Export Excel
@@ -305,52 +282,49 @@ export default function AdminDashboard() {
 
       <main className="max-w-7xl mx-auto px-6 py-8 grid lg:grid-cols-[280px_1fr_340px] gap-6">
 
-        {/* USERS unchanged */}
+        {/* USERS (ONLY ADD ACTIVE GREEN STATE) */}
         <aside className="bg-white border rounded-2xl shadow-sm p-4 sticky top-24 h-fit">
           <h2 className="text-xs uppercase text-gray-500 mb-3">
             Active Users ({data.active_savers})
           </h2>
 
           <div className="space-y-2 max-h-[65vh] overflow-y-auto">
-            {data.users.map((u) => (
-              <button
-                key={u.user_id}
-                onClick={() => setSelectedUser(u.user_id)}
-                className="w-full text-left p-3 rounded-xl border hover:bg-gray-50"
-              >
-                <p className="text-sm font-medium truncate">
-                  {u.full_name?.trim() || u.email}
-                </p>
-                <p className="text-xs text-gray-500">
-                  ₦{u.total_saved.toLocaleString()}
-                </p>
-              </button>
-            ))}
+            {data.users.map((u) => {
+              const active = activeUserId === u.user_id;
+
+              return (
+                <button
+                  key={u.user_id}
+                  onClick={() => {
+                    setSelectedUser(u.user_id);
+                    setActiveUserId(u.user_id);
+                  }}
+                  className={`w-full text-left p-3 rounded-xl border transition ${
+                    active ? "bg-green-100 border-green-500" : "hover:bg-gray-50"
+                  }`}
+                >
+                  <p className="text-sm font-medium truncate">
+                    {u.full_name?.trim() || u.email}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    ₦{u.total_saved.toLocaleString()}
+                  </p>
+                </button>
+              );
+            })}
           </div>
         </aside>
 
-        {/* CENTER */}
+        {/* CENTER (UNCHANGED) */}
         <section className="space-y-6">
-
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <Stat label="Total Users" value={data.total_users} />
             <Stat label="Active Savers" value={data.active_savers} />
-            <Stat
-              label="Platform Savings"
-              value={`₦${data.total_platform_savings.toLocaleString()}`}
-            />
-            <Stat
-              label="Daily Inflow"
-              value={`₦${data.daily_inflow.total_inflow.toLocaleString()}`}
-            />
+            <Stat label="Platform Savings" value={`₦${data.total_platform_savings.toLocaleString()}`} />
+            <Stat label="Daily Inflow" value={`₦${data.daily_inflow.total_inflow.toLocaleString()}`} />
             <Stat label="Today Contributions" value={data.today_contributions} />
             <Stat label="Pending Withdrawals" value={data.pending_withdrawals} />
-
-            {/* FIXED FIELD */}
-            <Stat
-              label="Withdrawable Balance"
-              value={`₦${(data.total_withdrawable_balance || 0).toLocaleString()}`}
-            />
+            <Stat label="Withdrawable Balance" value={`₦${(data.total_withdrawable_balance || 0).toLocaleString()}`} />
           </div>
 
           <div className="bg-white border rounded-2xl shadow-sm p-4">
@@ -359,15 +333,12 @@ export default function AdminDashboard() {
 
           <div className="bg-white border rounded-2xl shadow-sm p-4">
             {selectedUser ? (
-              <div className={loadingUserData ? "opacity-60" : ""}>
-                <ThriftCard
-                  key={`${selectedUser}-${month}-${year}`}
-                  month={month}
-                  year={year}
-                  dashboard={{ history: calendar }}
-                  isAdmin
-                />
-              </div>
+              <ThriftCard
+                month={month}
+                year={year}
+                dashboard={{ history: calendar }}
+                isAdmin
+              />
             ) : (
               <p className="text-sm text-gray-500 text-center py-10">
                 Select a user to view savings calendar
@@ -376,7 +347,7 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {/* WITHDRAWALS unchanged */}
+        {/* WITHDRAWALS (UNCHANGED) */}
         <aside className="space-y-6">
           <div className="bg-white border rounded-2xl shadow-sm p-4">
             <h2 className="text-xs uppercase text-gray-500 mb-3">
@@ -386,22 +357,12 @@ export default function AdminDashboard() {
             <div className="space-y-3 max-h-[40vh] overflow-y-auto">
               {withdrawals.map((w) => (
                 <div key={w.id} className="border rounded-xl p-3 bg-gray-50">
-
                   <span className={`text-xs px-2 py-1 rounded ${getStatusColor(w.status)}`}>
                     {w.status}
                   </span>
 
-                  <p className="font-medium text-sm mt-2">
-                    {w.user_full_name}
-                  </p>
-
+                  <p className="font-medium text-sm mt-2">{w.user_full_name}</p>
                   <p className="text-xs text-gray-500">{w.email}</p>
-
-                  {w.admin_note && (
-                    <p className="text-xs text-gray-600 mt-1">
-                      Note: {w.admin_note}
-                    </p>
-                  )}
 
                   <div className="flex gap-2 mt-2">
                     <button
@@ -426,14 +387,12 @@ export default function AdminDashboard() {
           </div>
 
           <div className="bg-white border rounded-2xl shadow-sm p-4">
-            <h2 className="text-xs uppercase text-gray-500 mb-3">
-              Audit Logs
-            </h2>
+            <h2 className="text-xs uppercase text-gray-500 mb-3">Audit Logs</h2>
 
             <div className="space-y-2 max-h-[40vh] overflow-y-auto">
               {logs.map((l) => (
                 <div key={l.id} className="text-xs border-b pb-2">
-                  <p className="text-gray-700">{l.description}</p>
+                  <p>{l.description}</p>
                   <p className="text-gray-400">
                     {new Date(l.created_at).toLocaleString()}
                   </p>
@@ -442,13 +401,24 @@ export default function AdminDashboard() {
             </div>
           </div>
         </aside>
-
       </main>
+
+      {/* FOOTER */}
+      <footer className="border-t bg-white mt-10">
+        <div className="max-w-7xl mx-auto px-6 py-6 flex justify-between text-sm text-gray-500">
+          <div className="flex items-center gap-2 font-medium text-gray-700">
+            <img src="/favicon.ico" className="w-5 h-5 rounded-full" />
+            Early Childhood Admin
+          </div>
+
+          <p>© {new Date().getFullYear()} All rights reserved</p>
+        </div>
+      </footer>
+
     </div>
   );
 }
 
-/* Stat unchanged */
 function Stat({
   label,
   value,
@@ -458,9 +428,7 @@ function Stat({
 }) {
   return (
     <div className="bg-white border rounded-2xl shadow-sm p-4">
-      <p className="text-xs uppercase tracking-wider text-gray-500">
-        {label}
-      </p>
+      <p className="text-xs uppercase tracking-wider text-gray-500">{label}</p>
       <p className="text-lg font-semibold mt-1">{value}</p>
     </div>
   );

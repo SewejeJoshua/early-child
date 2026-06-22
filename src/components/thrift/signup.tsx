@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Earlylogo from "@/assets/images/early-logo.jpeg";
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -20,7 +21,6 @@ export default function SignupPage() {
     setError("");
     setLoading(true);
 
-    // basic frontend validation
     if (password.length < 8) {
       setError("Password must be at least 8 characters");
       setLoading(false);
@@ -47,7 +47,7 @@ export default function SignupPage() {
             email: email.trim(),
             phone: phone.trim(),
             password,
-            daily_amount: Number(dailyAmount), // ✅ FIXED (was string)
+            daily_amount: Number(dailyAmount),
           }),
         }
       );
@@ -55,7 +55,6 @@ export default function SignupPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        // better backend error handling
         const message =
           data?.detail ||
           data?.message ||
@@ -74,67 +73,80 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md bg-card border border-border rounded-2xl p-6 shadow-lg">
-        <h1 className="text-2xl font-bold text-center mb-1">
-          Start your thrift
-        </h1>
-        <p className="text-sm text-muted-foreground text-center mb-6">
-          One card a month. Track every day.
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-green-50 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md bg-white border border-gray-200 rounded-3xl shadow-2xl overflow-hidden">
 
-        <form onSubmit={onSubmit} className="space-y-4">
-          {/* First Name */}
+        <div className="px-8 pt-8 pb-4 text-center">
+
+          <img
+            src={Earlylogo}
+            alt="Early Child Logo"
+            className="w-20 h-20 rounded-full mx-auto shadow-md border-4 border-white"
+          />
+
+          <h1 className="mt-5 text-3xl font-bold text-gray-900">
+            Create Account
+          </h1>
+
+          <p className="mt-2 text-gray-500 text-sm">
+            Join our digital thrift platform and start saving daily.
+          </p>
+        </div>
+
+        <form
+          onSubmit={onSubmit}
+          className="px-8 pb-8 space-y-4"
+        >
           <input
             type="text"
             placeholder="First Name"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl border border-border bg-background outline-none focus:border-primary"
+            disabled={loading}
+            className="w-full rounded-xl border border-gray-300 px-4 py-3 bg-white outline-none transition focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50"
           />
 
-          {/* Last Name */}
           <input
             type="text"
             placeholder="Last Name"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl border border-border bg-background outline-none focus:border-primary"
+            disabled={loading}
+            className="w-full rounded-xl border border-gray-300 px-4 py-3 bg-white outline-none transition focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50"
           />
 
-          {/* Email */}
           <input
             type="email"
-            placeholder="Email"
+            placeholder="Email Address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl border border-border bg-background outline-none focus:border-primary"
+            disabled={loading}
+            className="w-full rounded-xl border border-gray-300 px-4 py-3 bg-white outline-none transition focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50"
           />
 
-          {/* Phone */}
           <input
             type="text"
             placeholder="Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl border border-border bg-background outline-none focus:border-primary"
+            disabled={loading}
+            className="w-full rounded-xl border border-gray-300 px-4 py-3 bg-white outline-none transition focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50"
           />
 
-          {/* Password */}
           <input
             type="password"
-            placeholder="Password (min 8 chars)"
+            placeholder="Password (minimum 8 characters)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl border border-border bg-background outline-none focus:border-primary"
+            disabled={loading}
+            className="w-full rounded-xl border border-gray-300 px-4 py-3 bg-white outline-none transition focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50"
           />
 
-          {/* Daily Amount */}
           <input
             type="number"
             placeholder="Daily Contribution (₦)"
@@ -142,34 +154,47 @@ export default function SignupPage() {
             onChange={(e) => setDailyAmount(e.target.value)}
             min={1}
             required
-            className="w-full px-4 py-3 rounded-xl border border-border bg-background outline-none focus:border-primary"
+            disabled={loading}
+            className="w-full rounded-xl border border-gray-300 px-4 py-3 bg-white outline-none transition focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50"
           />
 
-          {/* Error */}
           {error && (
-            <p className="text-sm text-red-500">{error}</p>
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+              {error}
+            </div>
           )}
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:opacity-90 transition disabled:opacity-50"
+            className="w-full rounded-xl bg-primary py-3.5 text-white font-semibold shadow-md hover:opacity-90 transition disabled:opacity-50"
           >
             {loading ? "Creating Account..." : "Create Account"}
           </button>
+                    <div className="relative py-2">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
 
-          {/* Login link */}
-          <p className="text-sm text-center text-muted-foreground">
+            <div className="relative flex justify-center">
+              <span className="bg-white px-3 text-xs uppercase tracking-wide text-gray-400">
+                Already registered?
+              </span>
+            </div>
+          </div>
+
+          <p className="text-center text-sm text-gray-600">
             Already have an account?{" "}
             <Link
               to="/thrift/login"
-              className="text-primary font-semibold hover:underline"
+              className="font-semibold text-primary hover:underline transition"
             >
-              Log in
+              Log in here
             </Link>
           </p>
         </form>
+
+         
       </div>
     </div>
   );

@@ -307,7 +307,7 @@ export default function Dashboard() {
 
             <p className="text-xs">
               For further enquiries, call:{" "}
-              <a href="tel:+234XXXXXXXXXX" className="text-foreground hover:underline">
+              <a href="tel:+2348034408237" className="text-foreground hover:underline">
                 +234 XXX XXX XXXX
               </a>
             </p>
@@ -328,9 +328,9 @@ export default function Dashboard() {
         <Modal onClose={() => setProfilePopup(false)}>
           <div className="bg-white p-5 rounded-xl w-[90vw] max-w-md">
             <ModalHeader title="Profile" onClose={() => setProfilePopup(false)} />
-            <p>{profile?.first_name} {profile?.last_name}</p>
-            <p>{profile?.email}</p>
-            <p>{profile?.phone}</p>
+            <p>Name: {profile?.first_name} {profile?.last_name}</p>
+            <p>Email: {profile?.email}</p>
+            <p>Phone number: {profile?.phone}</p>
             <p>Daily: ₦{profile?.daily_amount}</p>
           </div>
         </Modal>

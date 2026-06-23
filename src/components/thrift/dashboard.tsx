@@ -308,7 +308,7 @@ export default function Dashboard() {
             <p className="text-xs">
               For further enquiries, call:{" "}
               <a href="tel:+2348034408237" className="text-foreground hover:underline">
-                +234 XXX XXX XXXX
+                +234 803 440 8237
               </a>
             </p>
           </div>

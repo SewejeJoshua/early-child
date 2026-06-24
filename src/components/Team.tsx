@@ -6,22 +6,22 @@ import Chi from "@/assets/images/childfour.jpeg";
 
 const team = [
   {
-    name: "Wisdom",
-    role: "Founder & CEO",
+    name: "Ebu Friday Chukwuma",
+    role: "Founder/CEO ",
     image: Wiz,
     linkedin: "#",
     twitter: "https://x.com/wisdom_ade87034",
   },
   {
-    name: "Joshua",
-    role: "Co-Founder",
+    name: "Ebu Folake Christiana",
+    role: "Business Manager",
     image: Josh,
     linkedin: "https://www.linkedin.com/in/joshua-seweje-7746732a1",
     twitter: "https://x.com/Joshuathajosh",
   },
   {
-    name: "Chris",
-    role: "Lead Brand & UX Designer",
+    name: "Bisade Philips",
+    role: "Chief Strategy Officer",
     image: Chi,
     linkedin: "https://www.linkedin.com/in/chris-chiboka-36b6b7203",
     twitter: "https://x.com/chiboka_xd",

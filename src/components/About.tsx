@@ -1,23 +1,24 @@
+ 
 import { Helmet } from "react-helmet-async";
-import { Heart, BookOpen, Sprout, ArrowRight } from "lucide-react";
+import { Eye, Target, HandHeart, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import ScrollReveal from "@/components/animations/ScrollReveal";
 
 const values = [
   {
-    icon: BookOpen,
-    title: "Play-Based Learning",
-    desc: "We use play-based early childhood education methods that help children in Nigeria develop creativity, problem-solving skills, and confidence through guided exploration.",
+    icon: Eye,
+    title: "Our Vision",
+    desc: "To raise a generation of confident, responsible, and globally competitive children who positively impact their communities and the world.",
   },
   {
-    icon: Heart,
-    title: "Compassionate Care",
-    desc: "We provide a safe, loving, and inclusive preschool environment in Ibadan where every child feels valued, supported, and emotionally secure.",
+    icon: Target,
+    title: "Our Goal",
+    desc: "To equip children with the knowledge, skills, confidence, and opportunities needed to achieve their dreams and become successful future leaders.",
   },
   {
-    icon: Sprout,
-    title: "Holistic Child Development",
-    desc: "Our programs focus on cognitive, emotional, social, and physical development to prepare children for lifelong learning success.",
+    icon: HandHeart,
+    title: "Our Commitment",
+    desc: "We are committed to providing a safe, nurturing, and inspiring environment where every child can learn, grow, and develop their unique potential.",
   },
 ];
 
@@ -39,29 +40,33 @@ const About = () => {
 
       <section id="about" className="py-28 bg-background">
         <div className="container mx-auto px-4 max-w-6xl">
-
           <div className="grid lg:grid-cols-2 gap-16 items-start">
 
             {/* LEFT CONTENT */}
             <div>
-
               <ScrollReveal>
                 <span className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground font-body font-500 text-xs uppercase tracking-wider px-3 py-1.5 rounded-md mb-6">
-                  About Our School
+                  About Our Organization
                 </span>
               </ScrollReveal>
 
               <ScrollReveal delay={0.1}>
                 <h1 className="font-display text-3xl md:text-4xl font-800 leading-tight mb-6 text-balance">
-                  Trusted Early Childhood Education in Ibadan, Nigeria
+                  Empowering Children for a Brighter Future
                 </h1>
               </ScrollReveal>
 
               <ScrollReveal delay={0.2}>
-                <p className="font-body text-base leading-relaxed mb-8">
-                  At Early Childhood Development Ltd, we provide high-quality early childhood education in Ibadan, Nigeria.
-                  Our goal is to build strong learning foundations through structured preschool programs,
-                  safe learning environments, and experienced educators who care deeply about each child's development.
+                <p className="font-body text-base leading-relaxed mb-8 text-justify">
+                  EarlyChildhood Global Limited is dedicated to raising
+                  well-rounded children through mentorship, leadership,
+                  entrepreneurship, character development, and savings programs.
+                  We empower children with the knowledge, confidence, and
+                  opportunities to achieve their dreams. Our programs provide a
+                  safe and inspiring environment for learning and growth. We
+                  nurture each child’s unique talents and potential. Our goal is
+                  to raise responsible, confident, and globally competitive
+                  future leaders.
                 </p>
               </ScrollReveal>
 
@@ -73,7 +78,6 @@ const About = () => {
                   Explore our programs <ArrowRight size={14} />
                 </a>
               </ScrollReveal>
-
             </div>
 
             {/* RIGHT CONTENT */}
@@ -133,3 +137,4 @@ const About = () => {
 };
 
 export default About;
+ 

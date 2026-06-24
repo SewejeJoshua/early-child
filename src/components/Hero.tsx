@@ -134,11 +134,13 @@ const Hero = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-base md:text-lg mb-10 leading-relaxed lg:py-5"
+              className="text-base md:text-lg mb-10 leading-relaxed lg:py-5 text-justify"
             >
-              We create safe, evidence-based environments where children explore,
-              grow, and discover their limitless potential through structured
-              play-based learning and compassionate care.
+             Our mission is to empower very child at young age to achieve success in life
+             through early self discovery, leadership building capacity, empowerments, skill development 
+             monitoring and oppourtunities that inspire condifence, leadership, innovation and 
+             personal growth. We are commited to helping every cbhild discover their God's given potential
+             and become responsible, productive and make a positive impact in the world.
             </motion.p>
 
             <motion.div

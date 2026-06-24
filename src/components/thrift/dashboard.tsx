@@ -246,10 +246,10 @@ export default function Dashboard() {
       )}
 
       {/* HEADER */}
-      <header className="border-b p-3 sm:p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+      <header className="border-b p-3 mt-4 sm:p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <Link to="/" className="flex items-center gap-3 font-bold text-lg">
           <img src="/favicon.ico" className="w-8 h-8 rounded-full" />
-          <span>Welcome back, {username}</span>
+          <span className="md:text-xl lg:text-2xl">Hello, {username}</span>
         </Link>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -271,9 +271,7 @@ export default function Dashboard() {
             <HistoryIcon />
           </button>
 
-          <button onClick={handleLogout} className="border px-3 py-2 rounded-full">
-            Logout
-          </button>
+          
         </div>
       </header>
 
@@ -332,6 +330,9 @@ export default function Dashboard() {
             <p>Email: {profile?.email}</p>
             <p>Phone number: {profile?.phone}</p>
             <p>Daily: ₦{profile?.daily_amount}</p>
+            <button onClick={handleLogout} className="border px-3 py-1 mt-2 rounded-full">
+            Logout
+          </button>
           </div>
         </Modal>
       )}

@@ -67,15 +67,14 @@ const Contact = () => {
 
               <ScrollReveal delay={0.1}>
                 <h1 className="font-display text-3xl md:text-4xl font-800 text-foreground mb-4 leading-tight">
-                  Get in Touch With Our Preschool in Ibadan
+                  Get in Touch With Us
                 </h1>
               </ScrollReveal>
 
               <ScrollReveal delay={0.2}>
                 <p className="font-body text-muted-foreground text-base leading-relaxed mb-8">
-                  Have questions about our early childhood education programs in Nigeria?
-                  We are here to help parents, guardians, and families choose the right
-                  learning path for their children.
+                  Have questions about our mentorship, leadership, entrepreneurship, savings, or child development programs?
+We are here to help parents and guardians provide children with the knowledge, confidence, and opportunities they need to achieve their dreams and succeed in life.
                 </p>
               </ScrollReveal>
 

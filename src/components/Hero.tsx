@@ -105,7 +105,7 @@ const Hero = () => {
               className="inline-flex items-center gap-2 bg-card border border-border text-foreground text-sm px-4 py-2 rounded-full mb-8 shadow-soft"
             >
               <CheckCircle2 size={14} className="text-primary" />
-              Trusted by 500+ families
+              Trusted by 3000+ families
             </motion.div>
 
             {/* TYPING SECTION */}

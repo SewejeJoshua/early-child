@@ -46,7 +46,7 @@ const About = () => {
             <div>
               <ScrollReveal>
                 <span className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground font-body font-500 text-xs uppercase tracking-wider px-3 py-1.5 rounded-md mb-6">
-                  About Our Organization
+                  About Us
                 </span>
               </ScrollReveal>
 

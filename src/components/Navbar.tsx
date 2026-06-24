@@ -38,8 +38,8 @@ const Navbar = () => {
           <div className="w-9 h-9 rounded-lg flex items-center justify-center">
             <img src={Earlylogo} className="rounded-full" alt="Logo" />
           </div>
-          <span className="font-display text-lg font-700 text-foreground tracking-tight">
-            Early Childhood
+          <span className="font-bold text-lg lg:text-2xl font-weight: 400 font-700 text-foreground tracking-tight">
+            EarlyChildhood Global Limited
           </span>
         </Link>
 

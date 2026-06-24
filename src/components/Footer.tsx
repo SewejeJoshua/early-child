@@ -65,19 +65,18 @@ const Footer = () => {
 
               <img
                 src={Earlylogo}
-                alt="Early Childhood Development Ltd Logo"
-                className="w-9 h-9 rounded-lg object-cover"
+                alt="EarlyChildhood Global Limited Logo"
+                className="w-9 h-9 rounded-2xl object-cover"
               />
 
               <span className="font-display text-lg font-700 text-primary-foreground">
-                Early Childhood Development Ltd
+                EarlyChildhood Global Limited
               </span>
 
             </div>
 
             <p className="font-body text-primary-foreground/50 text-sm leading-relaxed max-w-sm">
-              A trusted early childhood education and preschool center in Ibadan, Nigeria,
-              focused on play-based learning and holistic child development.
+              Empowering children through mentorship, leadership development, entrepreneurship training, character building, and early savings programs designed to raise confident and future-ready leaders.
             </p>
           </div>
 
@@ -128,14 +127,14 @@ const Footer = () => {
           {/* UPDATES */}
           <div>
             <h4 className="font-display font-600 text-primary-foreground/40 text-xs uppercase tracking-wider mb-5">
-              School Updates
+               Updates
             </h4>
 
             <button
               onClick={() => setShowNewsletter(true)}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground font-body font-600 text-sm hover:bg-primary/90 transition-colors"
             >
-              View News
+             Our Updates
               <ArrowUpRight size={16} />
             </button>
           </div>
@@ -146,7 +145,7 @@ const Footer = () => {
         <div className="border-t border-primary-foreground/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
 
           <p className="font-body text-primary-foreground/30 text-sm">
-            © {new Date().getFullYear()} Early Childhood Development Ltd. All rights reserved.
+            © {new Date().getFullYear()} EarlyChildhood Global Limited. All rights reserved.
           </p>
 
           <div className="flex gap-6">

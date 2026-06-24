@@ -43,7 +43,7 @@ const Team = () => {
             Our Team
           </span>
           <h2 className="mt-4 font-display text-2xl md:text-4xl font-bold text-foreground">
-            Meet the People Behind Early Childhood
+            Meet the People Behind EarlyChildhood
           </h2>
           <p className="mt-6 text-lg text-muted-foreground">
             A diverse team of experts passionate about creating exceptional digital experiences.

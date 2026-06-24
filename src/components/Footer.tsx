@@ -177,11 +177,11 @@ const Footer = () => {
             </button>
 
             <h2 className="font-display text-3xl font-800 mb-2">
-              School Updates & News
+              Latest Updates
             </h2>
 
             <p className="text-gray-500 mb-8">
-              Latest announcements from Early Childhood Development Ltd, Ibadan.
+              Latest announcements from EarlyChildhood Global Limited.
             </p>
 
             {loading ? (

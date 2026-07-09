@@ -15,8 +15,9 @@ const AdminLogin = () => {
     setError("");
 
     try {
+      
       const res = await fetch(
-        `${import.meta.env.VITE_ECHILDHOOD_API}/account/login/`,
+        `${import.meta.env.VITE_ECHILDHOOD_API}/accounts/login/`,
         {
           method: "POST",
           headers: {

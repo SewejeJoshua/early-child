@@ -246,34 +246,77 @@ export default function Dashboard() {
       )}
 
       {/* HEADER */}
-      <header className="border-b p-3 mt-4 sm:p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-        <Link to="/" className="flex items-center gap-3 font-bold text-lg">
-          <img src="/favicon.ico" className="w-8 h-8 rounded-full" />
-          <span className="md:text-xl lg:text-2xl">Hello, {username}</span>
-        </Link>
+    {/* HEADER */}
+<header className="border-b p-3 mt-4 sm:p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+  {/* Top section */}
+  <div className="flex items-center justify-between sm:justify-start sm:gap-3 w-full sm:w-auto">
+    <Link to="/" className="flex items-center gap-3 font-bold text-lg">
+      <img src="/favicon.ico" className="w-8 h-8 rounded-full" />
+      <span className="md:text-xl lg:text-2xl">
+        Hello, {username}
+      </span>
+    </Link>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <button onClick={handlePay} className="flex items-center gap-2 px-3 py-2 rounded-full bg-green-600 text-white">
-            <WalletIcon />
-            Pay ₦{dailyAmount}
-          </button>
+    {/* On mobile these sit beside "Hello" */}
+    <div className="flex items-center gap-2 sm:hidden">
+      <button
+        onClick={fetchProfile}
+        title="Profile"
+        className="rounded-full border p-2 hover:bg-gray-100 transition"
+      >
+        <UserIcon />
+      </button>
 
-          <button onClick={handleWithdraw} className="flex items-center gap-2 px-3 py-2 rounded-full bg-orange-500 text-white">
-            <WithdrawIcon />
-            Withdraw
-          </button>
+      <button
+        onClick={fetchHistory}
+        title="History"
+        className="rounded-full border p-2 hover:bg-gray-100 transition"
+      >
+        <HistoryIcon />
+      </button>
+    </div>
+  </div>
 
-          <button onClick={fetchProfile} title="Profile">
-            <UserIcon />
-          </button>
+  {/* Right side */}
+  <div className="flex flex-wrap items-center gap-4">
+    <button
+      onClick={handlePay}
+      className="flex items-center gap-2 px-3 py-2 rounded-full bg-green-600 text-white"
+    >
+      <WalletIcon />
+      Pay ₦{dailyAmount}
+    </button>
 
-          <button onClick={fetchHistory} title="History">
-            <HistoryIcon />
-          </button>
+    <button
+      onClick={handleWithdraw}
+      className="flex items-center gap-2 px-3 py-2 rounded-full bg-orange-500 text-white"
+    >
+      <WithdrawIcon />
+      Withdraw
+    </button>
 
-          
-        </div>
-      </header>
+    {/* Same buttons shown normally on desktop */}
+    <div className="hidden sm:flex items-center gap-2">
+      <button
+        onClick={fetchProfile}
+        title="Profile"
+        className="flex items-center gap-2 rounded-full border px-3 py-2 hover:bg-gray-100 transition"
+      >
+        <UserIcon />
+        <span className="text-sm">Profile</span>
+      </button>
+
+      <button
+        onClick={fetchHistory}
+        title="History"
+        className="flex items-center gap-2 rounded-full border px-3 py-2 hover:bg-gray-100 transition"
+      >
+        <HistoryIcon />
+        <span className="text-sm">History</span>
+      </button>
+    </div>
+  </div>
+</header>
 
       {/* MAIN */}
       <main className="max-w-4xl mx-auto px-3 py-6 space-y-5">
@@ -312,9 +355,13 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-4 text-sm">
-            <Link to="/" className="hover:text-foreground transition">
-              Home
-            </Link>
+            <Link
+  to="/"
+  className="rounded-full border p-2 hover:bg-gray-100 transition"
+  title="Home"
+>
+  <HomeIcon />
+</Link>
 
              
           </div>
@@ -389,7 +436,38 @@ function UserIcon() {
      <path d="M8 11l4 4 4-4" stroke="currentColor" strokeWidth="2"/>
       <path d="M4 21h16" stroke="currentColor" strokeWidth="2"/> </svg> ); 
       }
-      
+      function HomeIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <path
+        d="M3 10.5L12 3l9 7.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M5 10v10h14V10"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10 20v-6h4v6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
   function Modal({ children, onClose }: any) { 
     return ( 
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center" onClick={onClose}>

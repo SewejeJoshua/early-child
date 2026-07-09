@@ -17,11 +17,11 @@ import Inbox from "@/components/admin/Inbox";
 import BMessage from "@/components/admin/BroadcastedMessage";
 
 // children's day
-import ChildrensDayRegistrationForm from "@/components/ChildrensDayRegistrationForm";
-import Childadminlogin from "@/components/childrenday/Childadminlogin";
-import Childadmindash from "./components/childrenday/Childadmindash";
-import Childdashhome from "@/components/childrenday/Childdashhome";
-import Registered from "@/components/childrenday/Registered";
+// import ChildrensDayRegistrationForm from "@/components/ChildrensDayRegistrationForm";
+// import Childadminlogin from "@/components/childrenday/Childadminlogin";
+// import Childadmindash from "./components/childrenday/Childadmindash";
+// import Childdashhome from "@/components/childrenday/Childdashhome";
+// import Registered from "@/components/childrenday/Registered";
 
 // thrift user
 import Landing from "@/components/thrift/landing";
@@ -52,11 +52,11 @@ const App = () => (
           <Route path="/admin" element={<EarlyAdminLogin />} />
 
           {/* CHILDREN DAY */}
-          <Route
+          {/* <Route
             path="/childrensdayregistrationform"
             element={<ChildrensDayRegistrationForm />}
           />
-          <Route path="/childrenday" element={<Childadminlogin />} />
+          <Route path="/childrenday" element={<Childadminlogin />} /> */}
 
           {/* THRIFT USER */}
           <Route path="/thrift/landing" element={<Landing />} />
@@ -95,11 +95,11 @@ const App = () => (
           </Route>
 
           {/* CHILD ADMIN DASHBOARD */}
-          <Route path="/childrenday/Childadmindash" element={<Childadmindash />}>
+          {/* <Route path="/childrenday/Childadmindash" element={<Childadmindash />}>
             <Route index element={<Childdashhome />} />
             <Route path="dashboardhome" element={<Childdashhome />} />
             <Route path="registered" element={<Registered />} />
-          </Route>
+          </Route> */}
 
           {/* CATCH ALL */}
           <Route path="*" element={<NotFound />} />

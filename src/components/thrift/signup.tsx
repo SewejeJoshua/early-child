@@ -2,6 +2,19 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Earlylogo from "@/assets/images/early-logo.jpeg";
 
+function formatField(field: string) {
+  const labels: Record<string, string> = {
+    first_name: "First Name",
+    last_name: "Last Name",
+    email: "Email",
+    phone: "Phone Number",
+    password: "Password",
+    daily_amount: "Daily Contribution",
+    non_field_errors: "",
+  };
+
+  return labels[field] || field.replace(/_/g, " ");
+}
 export default function SignupPage() {
   const navigate = useNavigate();
 
@@ -11,6 +24,7 @@ export default function SignupPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [dailyAmount, setDailyAmount] = useState("1000");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -32,7 +46,11 @@ export default function SignupPage() {
       setLoading(false);
       return;
     }
-
+    if (!acceptedTerms) {
+  setError("You must agree to the Terms & Conditions before creating an account.");
+  setLoading(false);
+  return;
+}
     try {
       const response = await fetch(
         `${import.meta.env.VITE_ECHILDHOOD_API}/accounts/register/`,
@@ -54,15 +72,31 @@ export default function SignupPage() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        const message =
-          data?.detail ||
-          data?.message ||
-          (typeof data === "object" && JSON.stringify(data)) ||
-          "Registration failed";
+if (!response.ok) {
+  let message = "Registration failed.";
 
-        throw new Error(message);
+  if (data?.detail) {
+    message = data.detail;
+  } else if (data?.message) {
+    message = data.message;
+  } else if (typeof data === "object" && data !== null) {
+    const errors: string[] = [];
+
+    Object.values(data).forEach((value) => {
+      if (Array.isArray(value)) {
+        value.forEach((msg) => errors.push(String(msg)));
+      } else if (typeof value === "string") {
+        errors.push(value);
       }
+    });
+
+    if (errors.length) {
+      message = errors.join("\n");
+    }
+  }
+
+  throw new Error(message);
+}
 
       navigate("/thrift/login");
     } catch (err) {
@@ -157,12 +191,40 @@ export default function SignupPage() {
             disabled={loading}
             className="w-full rounded-xl border border-gray-300 px-4 py-3 bg-white outline-none transition focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50"
           />
+          <div className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
+  <input
+    id="terms"
+    type="checkbox"
+    checked={acceptedTerms}
+    onChange={(e) => setAcceptedTerms(e.target.checked)}
+    disabled={loading}
+    className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+  />
 
+  <label
+    htmlFor="terms"
+    className="text-sm leading-6 text-gray-600"
+  >
+    I have read and agree to the{" "}
+    <Link
+      to="/thrift/terms"
+      target="_blank"
+      className="font-semibold text-primary hover:underline"
+    >
+      Terms & Conditions
+    </Link>
+    .
+  </label>
+</div>
           {error && (
-            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-              {error}
-            </div>
-          )}
+  <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+    <ul className="list-disc pl-5 space-y-1 text-sm text-red-600 whitespace-pre-line">
+      {error.split("\n").map((item, index) => (
+        <li key={index}>{item}</li>
+      ))}
+    </ul>
+  </div>
+)}
 
           <button
             type="submit"

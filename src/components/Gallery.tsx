@@ -25,31 +25,31 @@ import Vid2 from "@/assets/videos/galvid2.mp4";
 import Vid3 from "@/assets/videos/galvid5.mp4";
 
 const pictures = [
-  { src: Img1, title: "Creative Learning", desc: "Children exploring creative play." },
-  { src: Img2, title: "Group Activities", desc: "Learning together as a community." },
+  { src: Img1, title: "Committee", desc: "Managing operations on behalf of the board." },
+  { src: Img2, title: "Outdoor Fun", desc: "Healthy outdoor engagement." },
   { src: Img3, title: "Outdoor Fun", desc: "Healthy outdoor engagement." },
-  { src: Img4, title: "Classroom Moments", desc: "Interactive classroom learning." },
-  { src: Img5, title: "Creative Learning", desc: "Children exploring creative play." },
-  { src: Img6, title: "Group Activities", desc: "Learning together as a community." },
-  { src: Img7, title: "Outdoor Fun", desc: "Healthy outdoor engagement." },
-  { src: Img8, title: "Classroom Moments", desc: "Interactive classroom learning." },
-  { src: Img9, title: "Classroom Moments", desc: "Interactive classroom learning." },
-  { src: Img10, title: "Classroom Moments", desc: "Interactive classroom learning." },
-  { src: Img11, title: "Classroom Moments", desc: "Interactive classroom learning." },
+  { src: Img4, title: "Guests", desc: "Notable individuals who have visited our center." },
+  { src: Img5, title: "Committee", desc: "Managing operations on behalf of the board." },
+  { src: Img6, title: "Our Notebook", desc: "Unveiling our new notebook." },
+  { src: Img7, title: "Grand Launching", desc: "Unveiling our new books." },
+  { src: Img8, title: "Committee ", desc: "Managing operations on behalf of the board." },
+  { src: Img9, title: "Our Notebook", desc: "Unveiling our new notebooks." },
+  { src: Img10, title: "Health Outreach", desc: "Creating health awareness." },
+  { src: Img11, title: "Our Notebook", desc: "Unveiling our new jotter." },
 ];
 
 const videos = [
   {
     video: Vid1,
-    title: "Learning Session",
+    title: "About EarlyChildhood ",
   },
   {
     video: Vid2,
-    title: "Creative Activities",
+    title: "EarlyChildhood Savings and Investment",
   },
   {
     video: Vid3,
-    title: "Creative Activities",
+    title: "Fun Activities",
   },
 ];
 

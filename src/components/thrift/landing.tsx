@@ -43,9 +43,9 @@ export default function Landing() {
           </h1>
 
           <p className="mt-5 text-lg text-muted-foreground max-w-lg">
-            Verdant now ships with a built-in daily thrift card. Track your
-            contributions, let your collector tick them off, and see your
-            monthly payout in real time.
+            EarlyChildhood Global Limited now ships with a built-in daily thrift card. Track your
+            contributions, let your payment tick them off, and see your
+          payout in real time.
           </p>
 
           <div className="mt-8 flex gap-3 flex-wrap">
@@ -130,11 +130,11 @@ export default function Landing() {
         {[
           {
             t: "Daily check-ins",
-            d: "Your collector ticks each day's payment from the admin dashboard.",
+            d: "Watch how your card ticks on each day's payment on your dashboard.",
           },
           {
             t: "Auto totals",
-            d: "Live monthly total with the 10% service deduction worked out for you.",
+            d: "Live total of your contributions and payouts.",
           },
           {
             t: "Always visible",

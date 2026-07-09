@@ -5,11 +5,13 @@ const BroadcastMessage = () => {
   const [image, setImage] = useState<File | null>(null);
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
-  const [statusMsg, setStatusMsg] = useState({ type: "", text: "" });
+  const [statusMsg, setStatusMsg] = useState({
+    type: "",
+    text: "",
+  });
 
-  // Store image
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
+    if (e.target.files?.length) {
       setImage(e.target.files[0]);
     }
   };
@@ -19,43 +21,93 @@ const BroadcastMessage = () => {
     setLoading(true);
     setStatusMsg({ type: "", text: "" });
 
-    // 1. Get the token from localStorage
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
 
-    // 2. Prepare FormData
+    if (!token) {
+      setStatusMsg({
+        type: "error",
+        text: "Please log in as an administrator.",
+      });
+      setLoading(false);
+      return;
+    }
+
     const formData = new FormData();
     formData.append("title", title);
-    if (image) formData.append("image", image);
+
+    if (image) {
+      formData.append("image", image);
+    }
+
     formData.append("content", content);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_ECHILDHOOD_API}/api/news/`, {
-        method: "POST",
-        headers: {
-          // 3. Add the Authorization header
-          // Note: Using "Token" prefix (common for Django). Change to "Bearer" if needed.
-          "Authorization": `Token ${token}`, 
-          // Note: DO NOT add 'Content-Type': 'multipart/form-data' here. 
-          // Fetch will set it automatically with the correct boundary.
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_ECHILDHOOD_API}/api/news/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
 
       if (response.ok) {
-        setStatusMsg({ type: "success", text: "Broadcast sent successfully!" });
-        // Clear form
+        setStatusMsg({
+          type: "success",
+          text: "Broadcast sent successfully!",
+        });
+
         setTitle("");
         setImage(null);
         setContent("");
-      } else if (response.status === 401) {
-        setStatusMsg({ type: "error", text: "Session expired. Please log in again." });
+
+        // Clear the file input
+        const fileInput = document.getElementById(
+          "broadcast-image"
+        ) as HTMLInputElement | null;
+
+        if (fileInput) {
+          fileInput.value = "";
+        }
+      } else if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+
+        setStatusMsg({
+          type: "error",
+          text: "Your session has expired. Please log in again.",
+        });
       } else {
-        const errorData = await response.json();
-        setStatusMsg({ type: "error", text: errorData.message || "Failed to send broadcast." });
+        let errorMessage = "Failed to send broadcast.";
+
+        try {
+          const errorData = await response.json();
+
+          if (typeof errorData.detail === "string") {
+            errorMessage = errorData.detail;
+          } else if (typeof errorData.message === "string") {
+            errorMessage = errorData.message;
+          } else if (typeof errorData.error === "string") {
+            errorMessage = errorData.error;
+          }
+        } catch {
+          // Ignore JSON parsing errors
+        }
+
+        setStatusMsg({
+          type: "error",
+          text: errorMessage,
+        });
       }
     } catch (error) {
       console.error(error);
-      setStatusMsg({ type: "error", text: "Network error. Please try again later." });
+
+      setStatusMsg({
+        type: "error",
+        text: "Network error. Please try again later.",
+      });
     } finally {
       setLoading(false);
     }
@@ -63,7 +115,6 @@ const BroadcastMessage = () => {
 
   return (
     <div className="max-w-3xl mx-auto">
-      {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Broadcast Message</h1>
         <p className="text-muted-foreground text-sm">
@@ -71,20 +122,25 @@ const BroadcastMessage = () => {
         </p>
       </div>
 
-      {/* Form Container */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         {statusMsg.text && (
-          <div className={`mb-4 p-3 rounded-lg text-sm text-center ${
-            statusMsg.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-          }`}>
+          <div
+            className={`mb-4 p-3 rounded-lg text-sm text-center ${
+              statusMsg.type === "success"
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
             {statusMsg.text}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Title */}
           <div>
-            <label className="block text-sm font-medium mb-2">Message Title</label>
+            <label className="block text-sm font-medium mb-2">
+              Message Title
+            </label>
+
             <input
               type="text"
               placeholder="e.g School Holiday Announcement"
@@ -95,10 +151,13 @@ const BroadcastMessage = () => {
             />
           </div>
 
-          {/* Image */}
           <div>
-            <label className="block text-sm font-medium mb-2">Image</label>
+            <label className="block text-sm font-medium mb-2">
+              Image
+            </label>
+
             <input
+              id="broadcast-image"
               type="file"
               accept="image/*"
               onChange={handleImage}
@@ -107,9 +166,11 @@ const BroadcastMessage = () => {
             />
           </div>
 
-          {/* Message */}
           <div>
-            <label className="block text-sm font-medium mb-2">Message Content</label>
+            <label className="block text-sm font-medium mb-2">
+              Message Content
+            </label>
+
             <textarea
               rows={5}
               placeholder="Write your announcement here..."
@@ -120,7 +181,6 @@ const BroadcastMessage = () => {
             />
           </div>
 
-          {/* Button */}
           <div className="flex justify-end">
             <button
               type="submit"

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Earlylogo from "@/assets/images/early-logo.jpeg";
 
-const AdminLogin = () => {
+export default function LoginPage() {
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
@@ -9,13 +10,12 @@ const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = async (e: React.FormEvent) => {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      
       const res = await fetch(
         `${import.meta.env.VITE_ECHILDHOOD_API}/accounts/login/`,
         {
@@ -23,88 +23,99 @@ const AdminLogin = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({
+            username: username.trim(),
+            password,
+          }),
         }
       );
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Login failed");
+        setError(data?.detail || data?.message || "Login failed");
+        return;
       }
 
-      // ✅ Save token for future requests
-      if (data.token) {
-        localStorage.setItem("token", data.token);
+      // Allow only admins
+      const isAdmin =
+        data?.user?.is_staff === true ||
+        data?.user?.is_superuser === true;
+
+      if (!isAdmin) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+
+        setError("Only administrators are allowed to log in.");
+        return;
       }
 
-      // Optional: save user info
-      if (data.user) {
-        localStorage.setItem("adminUser", JSON.stringify(data.user));
-      }
+      // Save tokens only for admins
+      localStorage.setItem("accessToken", data.access);
+      localStorage.setItem("refreshToken", data.refresh);
 
-      navigate("/admin/EarlyAdminDash");
+      // Optional: Save admin info
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      navigate("/admin/EarlyAdminDash", { replace: true });
     } catch (err: any) {
-      setError(err.message);
+      setError(err?.message || "Network error. Try again.");
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8">
-        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
-          Admin Login
-        </h2>
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <form
+        onSubmit={handleLogin}
+        className="w-full max-w-md p-6 border rounded-xl space-y-4 bg-white shadow"
+      >
+        <div className="text-center space-y-2">
+          <img
+            src={Earlylogo}
+            className="w-16 h-16 mx-auto rounded-full"
+            alt="Logo"
+          />
+
+          <h1 className="text-xl font-bold">Login here</h1>
+
+          <p className="text-sm text-gray-500">
+            Welcome back
+          </p>
+        </div>
+
+        <input
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Email or Username"
+          disabled={loading}
+          className="w-full p-3 border rounded disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          disabled={loading}
+          className="w-full p-3 border rounded disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary"
+        />
 
         {error && (
-          <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
+          <div className="p-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded">
+            {error}
+          </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-5">
-          {/* Username */}
-          <div>
-            <label className="block text-sm font-medium mb-1 text-gray-700">
-              Username
-            </label>
-            <input
-              type="text"
-              placeholder="Admin"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-            />
-          </div>
-
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-medium mb-1 text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-            />
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-green-600 text-white py-2.5 rounded-lg hover:bg-green-700 transition font-semibold disabled:opacity-60"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-      </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-primary text-white p-3 rounded font-medium hover:opacity-90 transition disabled:opacity-60"
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
+      </form>
     </div>
   );
-};
-
-export default AdminLogin;
+}
